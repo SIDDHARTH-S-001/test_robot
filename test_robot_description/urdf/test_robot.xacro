@@ -132,7 +132,7 @@
 
 <link name="servo_mount_v2_1">
   <inertial>
-    <origin xyz="0.022810444394987556 -1.5494500188104054e-09 -0.007692668094140112" rpy="0 0 0"/>
+    <origin xyz="0.022810444394987556 -1.5494500209788098e-09 -0.0026926680941401007" rpy="0 0 0"/>
     <mass value="0.28990445760104805"/>
     <inertia ixx="5.9e-05" iyy="0.00017" izz="0.000152" ixy="0.0" iyz="-0.0" ixz="6e-06"/>
   </inertial>
@@ -153,19 +153,19 @@
 
 <link name="camera_mount_v2_1">
   <inertial>
-    <origin xyz="0.009999999999998233 2.0903417885520525e-16 0.0030000000000000443" rpy="0 0 0"/>
+    <origin xyz="0.009999999999998233 2.0686577451023425e-16 0.0030000000000000304" rpy="0 0 0"/>
     <mass value="0.012966923677691866"/>
     <inertia ixx="5e-06" iyy="5e-06" izz="1e-05" ixy="0.0" iyz="-0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.19055 -0.0025 -0.07723" rpy="0 0 0"/>
+    <origin xyz="-0.19055 -0.0025 -0.08223" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_mount_v2_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="paek_beige"/>
   </visual>
   <collision>
-    <origin xyz="-0.19055 -0.0025 -0.07723" rpy="0 0 0"/>
+    <origin xyz="-0.19055 -0.0025 -0.08223" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_mount_v2_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -174,19 +174,19 @@
 
 <link name="camera_v4_1">
   <inertial>
-    <origin xyz="0.05512009244754448 3.3471489468972493e-15 0.045945900256365614" rpy="0 0 0"/>
+    <origin xyz="0.003870092447544521 3.342378457338313e-15 0.022445900256365642" rpy="0 0 0"/>
     <mass value="0.6054290756769216"/>
     <inertia ixx="0.000158" iyy="0.000199" izz="0.000199" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.1599 -0.0025 -0.05718" rpy="0 0 0"/>
+    <origin xyz="-0.21055 -0.0025 -0.08623" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_v4_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="steel_satin"/>
   </visual>
   <collision>
-    <origin xyz="-0.1599 -0.0025 -0.05718" rpy="0 0 0"/>
+    <origin xyz="-0.21055 -0.0025 -0.08623" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_v4_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -232,15 +232,15 @@
 </joint>
 
 <joint name="Revolute 7" type="continuous">
-  <origin xyz="0.03815 0.0 0.01755" rpy="0 0 0"/>
+  <origin xyz="0.03815 0.0 0.02255" rpy="0 0 0"/>
   <parent link="servo_mount_v2_1"/>
   <child link="camera_mount_v2_1"/>
   <axis xyz="0.0 -0.0 1.0"/>
 </joint>
 
-<joint name="Rigid 8" type="fixed">
-  <origin xyz="0.0075 0.0 -0.0025" rpy="0 0 0"/>
-  <parent link="servo_mount_v2_1"/>
+<joint name="Rigid 9" type="fixed">
+  <origin xyz="0.02 0.0 0.004" rpy="0 0 0"/>
+  <parent link="camera_mount_v2_1"/>
   <child link="camera_v4_1"/>
 </joint>
 
