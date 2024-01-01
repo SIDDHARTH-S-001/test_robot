@@ -88,7 +88,7 @@
   </collision>
 </link>
 
-<link name="castor_v1_1">
+<link name="right_castor_1">
   <inertial>
     <origin xyz="-0.015000000000078367 0.019999999999999976 -0.025454061421393216" rpy="0 0 0"/>
     <mass value="0.04403091329657134"/>
@@ -97,19 +97,19 @@
   <visual>
     <origin xyz="-0.1474 0.1449 -0.05468" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/castor_v1_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/right_castor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="aluminum_satin"/>
   </visual>
   <collision>
     <origin xyz="-0.1474 0.1449 -0.05468" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/castor_v1_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/right_castor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
-<link name="ydlidar_x4_v1_1">
+<link name="ydlidar_x4_1">
   <inertial>
     <origin xyz="0.008294099570319522 -3.8163916471489756e-17 0.034201142222791026" rpy="0 0 0"/>
     <mass value="1.1515616542314233"/>
@@ -118,19 +118,19 @@
   <visual>
     <origin xyz="-0.0 -0.0025 -0.11668" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/ydlidar_x4_v1_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/ydlidar_x4_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="steel_satin"/>
   </visual>
   <collision>
     <origin xyz="-0.0 -0.0025 -0.11668" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/ydlidar_x4_v1_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/ydlidar_x4_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
-<link name="servo_mount_v2_1">
+<link name="servo_mount_1">
   <inertial>
     <origin xyz="0.022810444394987556 -1.5494500209788098e-09 -0.0026926680941401007" rpy="0 0 0"/>
     <mass value="0.28990445760104805"/>
@@ -139,19 +139,19 @@
   <visual>
     <origin xyz="-0.1524 -0.0025 -0.05968" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/servo_mount_v2_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/servo_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="acrylic_clear"/>
   </visual>
   <collision>
     <origin xyz="-0.1524 -0.0025 -0.05968" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/servo_mount_v2_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/servo_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
-<link name="camera_mount_v2_1">
+<link name="camera_mount_1">
   <inertial>
     <origin xyz="0.009999999999998233 2.0686577451023425e-16 0.0030000000000000304" rpy="0 0 0"/>
     <mass value="0.012966923677691866"/>
@@ -160,19 +160,19 @@
   <visual>
     <origin xyz="-0.19055 -0.0025 -0.08223" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/camera_mount_v2_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/camera_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="paek_beige"/>
   </visual>
   <collision>
     <origin xyz="-0.19055 -0.0025 -0.08223" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/camera_mount_v2_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/camera_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
-<link name="camera_v4_1">
+<link name="camera_1">
   <inertial>
     <origin xyz="0.003870092447544521 3.342378457338313e-15 0.022445900256365642" rpy="0 0 0"/>
     <mass value="0.6054290756769216"/>
@@ -181,26 +181,26 @@
   <visual>
     <origin xyz="-0.21055 -0.0025 -0.08623" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/camera_v4_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="steel_satin"/>
   </visual>
   <collision>
     <origin xyz="-0.21055 -0.0025 -0.08623" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="package://test_robot_description/meshes/camera_v4_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://test_robot_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
-<joint name="Revolute 1" type="continuous">
+<joint name="right_drive" type="continuous">
   <origin xyz="-0.116382 -0.183454 0.035" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="right_wheel_1"/>
   <axis xyz="0.0 -1.0 -0.0"/>
 </joint>
 
-<joint name="Revolute 2" type="continuous">
+<joint name="left_drive" type="continuous">
   <origin xyz="-0.116418 0.188454 0.035" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="left_wheel_1"/>
@@ -216,32 +216,32 @@
 <joint name="Rigid 4" type="fixed">
   <origin xyz="0.1474 -0.1449 0.05468" rpy="0 0 0"/>
   <parent link="base_link"/>
-  <child link="castor_v1_1"/>
+  <child link="right_castor_1"/>
 </joint>
 
 <joint name="Rigid 5" type="fixed">
   <origin xyz="0.0 0.0025 0.11668" rpy="0 0 0"/>
   <parent link="base_link"/>
-  <child link="ydlidar_x4_v1_1"/>
+  <child link="ydlidar_x4_1"/>
 </joint>
 
 <joint name="Rigid 6" type="fixed">
   <origin xyz="0.1524 0.0025 0.05968" rpy="0 0 0"/>
   <parent link="base_link"/>
-  <child link="servo_mount_v2_1"/>
+  <child link="servo_mount_1"/>
 </joint>
 
-<joint name="Revolute 7" type="continuous">
+<joint name="camera_joint" type="continuous">
   <origin xyz="0.03815 0.0 0.02255" rpy="0 0 0"/>
-  <parent link="servo_mount_v2_1"/>
-  <child link="camera_mount_v2_1"/>
+  <parent link="servo_mount_1"/>
+  <child link="camera_mount_1"/>
   <axis xyz="0.0 -0.0 1.0"/>
 </joint>
 
 <joint name="Rigid 9" type="fixed">
   <origin xyz="0.02 0.0 0.004" rpy="0 0 0"/>
-  <parent link="camera_mount_v2_1"/>
-  <child link="camera_v4_1"/>
+  <parent link="camera_mount_1"/>
+  <child link="camera_1"/>
 </joint>
 
 </robot>
