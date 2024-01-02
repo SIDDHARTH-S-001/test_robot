@@ -6,7 +6,7 @@
 <xacro:include filename="$(find test_robot_description)/urdf/test_robot.gazebo" />
 <link name="base_link">
   <inertial>
-    <origin xyz="-0.020632171778688 0.002500000000000126 0.07232033801694421" rpy="0 0 0"/>
+    <origin xyz="-0.017478616142263866 -0.0026167214840721615 0.07232033801694401" rpy="0 0 0"/>
     <mass value="1.7085553050360842"/>
     <inertia ixx="0.01599" iyy="0.013053" izz="0.025491" ixy="1e-06" iyz="0.0" ixz="-0.001461"/>
   </inertial>
@@ -27,19 +27,19 @@
 
 <link name="right_wheel_1">
   <inertial>
-    <origin xyz="-3.4200742424217445e-07 -0.0073158880868150755 -4.197731875474342e-06" rpy="0 0 0"/>
+    <origin xyz="2.1362899985111206e-07 -0.007315609570886977 -4.197731875744959e-06" rpy="0 0 0"/>
     <mass value="0.04524129578745742"/>
     <inertia ixx="2.1e-05" iyy="3.8e-05" izz="2.1e-05" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.116382 0.183454 -0.035" rpy="0 0 0"/>
+    <origin xyz="0.113229 0.188571 -0.035" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/right_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="opaque166158150"/>
   </visual>
   <collision>
-    <origin xyz="0.116382 0.183454 -0.035" rpy="0 0 0"/>
+    <origin xyz="0.113229 0.188571 -0.035" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/right_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -48,19 +48,19 @@
 
 <link name="left_wheel_1">
   <inertial>
-    <origin xyz="3.4200744483681156e-07 0.007315888086814659 3.864337692033315e-06" rpy="0 0 0"/>
+    <origin xyz="-1.0235613107090202e-07 0.0073161666027419525 3.864337691943109e-06" rpy="0 0 0"/>
     <mass value="0.04524129578745742"/>
     <inertia ixx="2.1e-05" iyy="3.8e-05" izz="2.1e-05" ixy="0.0" iyz="0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.116418 -0.188454 -0.035" rpy="0 0 0"/>
+    <origin xyz="0.113264 -0.183337 -0.035" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/left_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="opaque166158150"/>
   </visual>
   <collision>
-    <origin xyz="0.116418 -0.188454 -0.035" rpy="0 0 0"/>
+    <origin xyz="0.113264 -0.183337 -0.035" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/left_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -69,19 +69,19 @@
 
 <link name="left_castor_1">
   <inertial>
-    <origin xyz="-0.015000000000078645 -0.01999999999999974 -0.025454061421393108" rpy="0 0 0"/>
+    <origin xyz="-0.015000444363654358 -0.01999972148407214 -0.025454061421393268" rpy="0 0 0"/>
     <mass value="0.04403091329657134"/>
-    <inertia ixx="1.1e-05" iyy="1.1e-05" izz="2e-06" ixy="0.0" iyz="0.0" ixz="0.0"/>
+    <inertia ixx="1.1e-05" iyy="1.1e-05" izz="2e-06" ixy="0.0" iyz="-0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.1474 -0.1499 -0.05468" rpy="0 0 0"/>
+    <origin xyz="-0.150554 -0.144783 -0.05468" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/left_castor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="aluminum_satin"/>
   </visual>
   <collision>
-    <origin xyz="-0.1474 -0.1499 -0.05468" rpy="0 0 0"/>
+    <origin xyz="-0.150554 -0.144783 -0.05468" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/left_castor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -90,19 +90,19 @@
 
 <link name="right_castor_1">
   <inertial>
-    <origin xyz="-0.015000000000078367 0.019999999999999976 -0.025454061421393216" rpy="0 0 0"/>
+    <origin xyz="-0.015000444363654053 0.02000027851592795 -0.02545406142139353" rpy="0 0 0"/>
     <mass value="0.04403091329657134"/>
-    <inertia ixx="1.1e-05" iyy="1.1e-05" izz="2e-06" ixy="-0.0" iyz="-0.0" ixz="0.0"/>
+    <inertia ixx="1.1e-05" iyy="1.1e-05" izz="2e-06" ixy="-0.0" iyz="0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.1474 0.1449 -0.05468" rpy="0 0 0"/>
+    <origin xyz="-0.150554 0.150017 -0.05468" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/right_castor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="aluminum_satin"/>
   </visual>
   <collision>
-    <origin xyz="-0.1474 0.1449 -0.05468" rpy="0 0 0"/>
+    <origin xyz="-0.150554 0.150017 -0.05468" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/right_castor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -111,19 +111,19 @@
 
 <link name="ydlidar_x4_1">
   <inertial>
-    <origin xyz="0.008294099570319522 -3.8163916471489756e-17 0.034201142222791026" rpy="0 0 0"/>
+    <origin xyz="0.008293655206743676 2.7851592755744406e-07 0.03420114222279125" rpy="0 0 0"/>
     <mass value="1.1515616542314233"/>
-    <inertia ixx="0.000489" iyy="0.000861" izz="0.000987" ixy="-0.0" iyz="0.0" ixz="0.000148"/>
+    <inertia ixx="0.000489" iyy="0.000861" izz="0.000987" ixy="-0.0" iyz="-0.0" ixz="0.000148"/>
   </inertial>
   <visual>
-    <origin xyz="-0.0 -0.0025 -0.11668" rpy="0 0 0"/>
+    <origin xyz="-0.003154 0.002617 -0.11668" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/ydlidar_x4_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="steel_satin"/>
   </visual>
   <collision>
-    <origin xyz="-0.0 -0.0025 -0.11668" rpy="0 0 0"/>
+    <origin xyz="-0.003154 0.002617 -0.11668" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/ydlidar_x4_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -132,19 +132,19 @@
 
 <link name="servo_mount_1">
   <inertial>
-    <origin xyz="0.022810444394987556 -1.5494500209788098e-09 -0.0026926680941401007" rpy="0 0 0"/>
+    <origin xyz="0.02281000003141173 2.76966477701264e-07 -0.002692668094140295" rpy="0 0 0"/>
     <mass value="0.28990445760104805"/>
     <inertia ixx="5.9e-05" iyy="0.00017" izz="0.000152" ixy="0.0" iyz="-0.0" ixz="6e-06"/>
   </inertial>
   <visual>
-    <origin xyz="-0.1524 -0.0025 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.155554 0.002617 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/servo_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="acrylic_clear"/>
   </visual>
   <collision>
-    <origin xyz="-0.1524 -0.0025 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.155554 0.002617 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/servo_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -153,19 +153,19 @@
 
 <link name="camera_mount_1">
   <inertial>
-    <origin xyz="0.009999999999998233 2.0686577451023425e-16 0.0030000000000000304" rpy="0 0 0"/>
+    <origin xyz="0.009999555636422408 2.7851592789528146e-07 0.0029999999999999333" rpy="0 0 0"/>
     <mass value="0.012966923677691866"/>
-    <inertia ixx="5e-06" iyy="5e-06" izz="1e-05" ixy="0.0" iyz="-0.0" ixz="-0.0"/>
+    <inertia ixx="5e-06" iyy="5e-06" izz="1e-05" ixy="0.0" iyz="-0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.19055 -0.0025 -0.08223" rpy="0 0 0"/>
+    <origin xyz="-0.193704 0.002617 -0.08223" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="paek_beige"/>
   </visual>
   <collision>
-    <origin xyz="-0.19055 -0.0025 -0.08223" rpy="0 0 0"/>
+    <origin xyz="-0.193704 0.002617 -0.08223" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_mount_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -174,19 +174,19 @@
 
 <link name="camera_1">
   <inertial>
-    <origin xyz="0.003870092447544521 3.342378457338313e-15 0.022445900256365642" rpy="0 0 0"/>
+    <origin xyz="0.003869648083968641 2.7851593102558997e-07 0.022445900256365517" rpy="0 0 0"/>
     <mass value="0.6054290756769216"/>
     <inertia ixx="0.000158" iyy="0.000199" izz="0.000199" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.21055 -0.0025 -0.08623" rpy="0 0 0"/>
+    <origin xyz="-0.213704 0.002617 -0.08623" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="steel_satin"/>
   </visual>
   <collision>
-    <origin xyz="-0.21055 -0.0025 -0.08623" rpy="0 0 0"/>
+    <origin xyz="-0.213704 0.002617 -0.08623" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -195,19 +195,19 @@
 
 <link name="MPU_6050_1">
   <inertial>
-    <origin xyz="-3.1355336134285696e-05 -0.050012226392699075 0.0009153763215413793" rpy="0 0 0"/>
-    <mass value="0.004148060593361584"/>
+    <origin xyz="-5.851215794284645e-05 -0.049957645733138184 0.0012967230186990211" rpy="0 0 0"/>
+    <mass value="0.0012652929782472168"/>
     <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="-0.0" iyz="-0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.0 -0.1549 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 -0.149783 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/MPU_6050_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="steel_satin"/>
+    <material name="plastic_glossy_blue"/>
   </visual>
   <collision>
-    <origin xyz="0.0 -0.1549 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 -0.149783 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/MPU_6050_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -216,19 +216,19 @@
 
 <link name="ADXL335_1">
   <inertial>
-    <origin xyz="4.6126231438677886e-05 -0.025102857569161613 0.0004384677831028097" rpy="0 0 0"/>
-    <mass value="0.0022661803844448835"/>
+    <origin xyz="4.56818678628481e-05 -0.025102579053233917 0.00043846778310281664" rpy="0 0 0"/>
+    <mass value="0.000372404165087121"/>
     <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.0 -0.1549 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 -0.149783 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/ADXL335_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="opaque202209238"/>
   </visual>
   <collision>
-    <origin xyz="0.0 -0.1549 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 -0.149783 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/ADXL335_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -237,19 +237,19 @@
 
 <link name="MPU_9250_1">
   <inertial>
-    <origin xyz="-4.0745935269562253e-05 0.049982746308101816 0.0010543416597268984" rpy="0 0 0"/>
-    <mass value="0.006431034767624054"/>
+    <origin xyz="-5.2641964672283e-05 0.04998372466373088 0.0010604641626403774" rpy="0 0 0"/>
+    <mass value="0.0010620476629708976"/>
     <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="-0.0" iyz="-0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.0 0.1499 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 0.155017 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/MPU_9250_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver_default"/>
   </visual>
   <collision>
-    <origin xyz="-0.0 0.1499 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 0.155017 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/MPU_9250_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -258,19 +258,19 @@
 
 <link name="QMC5883_1">
   <inertial>
-    <origin xyz="3.957074476157516e-05 0.02470495460938099 0.0007776122652584164" rpy="0 0 0"/>
-    <mass value="0.0022004092587126446"/>
+    <origin xyz="0.00015378992721355603 0.024161721167240524 0.0011473923879169318" rpy="0 0 0"/>
+    <mass value="0.0005645426363999118"/>
     <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.0 0.1499 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 0.155017 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/QMC5883_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="steel_satin"/>
+    <material name="plastic_glossy_blue"/>
   </visual>
   <collision>
-    <origin xyz="-0.0 0.1499 -0.05968" rpy="0 0 0"/>
+    <origin xyz="-0.003154 0.155017 -0.05968" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://test_robot_description/meshes/QMC5883_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -278,39 +278,39 @@
 </link>
 
 <joint name="right_drive" type="continuous">
-  <origin xyz="-0.116382 -0.183454 0.035" rpy="0 0 0"/>
+  <origin xyz="-0.113229 -0.188571 0.035" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="right_wheel_1"/>
   <axis xyz="0.0 -1.0 -0.0"/>
 </joint>
 
 <joint name="left_drive" type="continuous">
-  <origin xyz="-0.116418 0.188454 0.035" rpy="0 0 0"/>
+  <origin xyz="-0.113264 0.183337 0.035" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="left_wheel_1"/>
   <axis xyz="-0.0 1.0 0.0"/>
 </joint>
 
 <joint name="Rigid 3" type="fixed">
-  <origin xyz="0.1474 0.1499 0.05468" rpy="0 0 0"/>
+  <origin xyz="0.150554 0.144783 0.05468" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="left_castor_1"/>
 </joint>
 
 <joint name="Rigid 4" type="fixed">
-  <origin xyz="0.1474 -0.1449 0.05468" rpy="0 0 0"/>
+  <origin xyz="0.150554 -0.150017 0.05468" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="right_castor_1"/>
 </joint>
 
 <joint name="Rigid 5" type="fixed">
-  <origin xyz="0.0 0.0025 0.11668" rpy="0 0 0"/>
+  <origin xyz="0.003154 -0.002617 0.11668" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="ydlidar_x4_1"/>
 </joint>
 
 <joint name="Rigid 6" type="fixed">
-  <origin xyz="0.1524 0.0025 0.05968" rpy="0 0 0"/>
+  <origin xyz="0.155554 -0.002617 0.05968" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="servo_mount_1"/>
 </joint>
@@ -329,25 +329,25 @@
 </joint>
 
 <joint name="Rigid 10" type="fixed">
-  <origin xyz="0.0 0.1549 0.05968" rpy="0 0 0"/>
+  <origin xyz="0.003154 0.149783 0.05968" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="MPU_6050_1"/>
 </joint>
 
 <joint name="Rigid 11" type="fixed">
-  <origin xyz="0.0 0.1549 0.05968" rpy="0 0 0"/>
+  <origin xyz="0.003154 0.149783 0.05968" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="ADXL335_1"/>
 </joint>
 
 <joint name="Rigid 12" type="fixed">
-  <origin xyz="0.0 -0.1499 0.05968" rpy="0 0 0"/>
+  <origin xyz="0.003154 -0.155017 0.05968" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="MPU_9250_1"/>
 </joint>
 
 <joint name="Rigid 13" type="fixed">
-  <origin xyz="0.0 -0.1499 0.05968" rpy="0 0 0"/>
+  <origin xyz="0.003154 -0.155017 0.05968" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="QMC5883_1"/>
 </joint>
