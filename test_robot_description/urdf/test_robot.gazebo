@@ -15,14 +15,14 @@
 </gazebo>
 
 <gazebo reference="right_wheel">
-  <material>${body_color}</material>
+  <material>Gazebo/Black</material>
   <mu1>100</mu1>
   <mu2>100</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="left_wheel">
-  <material>${body_color}</material>
+  <material>Gazebo/Black</material>
   <mu1>100</mu1>
   <mu2>100</mu2>
   <selfCollide>true</selfCollide>
@@ -43,56 +43,56 @@
 </gazebo>
 
 <gazebo reference="ydlidar_x4">
-  <material>${body_color}</material>
+  <material>Gazebo/Blue</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="servo_mount">
-  <material>${body_color}</material>
+  <material>Gazebo/Grey</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="camera_mount">
-  <material>${body_color}</material>
+  <material>Gazebo/Yellow</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="camera">
-  <material>${body_color}</material>
+  <material>Gazebo/Red</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="MPU_6050">
-  <material>${body_color}</material>
+  <material>Gazebo/Turquoise</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="ADXL335">
-  <material>${body_color}</material>
+  <material>Gazebo/Blue</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="MPU_9250">
-  <material>${body_color}</material>
+  <material>Gazebo/Blue</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
 </gazebo>
 
 <gazebo reference="QMC5883">
-  <material>${body_color}</material>
+  <material>Gazebo/SkyBlue</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
   <selfCollide>true</selfCollide>
@@ -196,7 +196,7 @@
   <gazebo reference="ydlidar_x4">
     <sensor type="ray" name="head_hokuyo_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -226,6 +226,27 @@
         <topicName>/scan</topicName>
         <frameName>ydlidar_x4</frameName>
       </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="MPU_9250">
+    <gravity>true</gravity>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+      <topic>__default_topic__</topic>
+      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+        <topicName>MPU_9250/imu</topicName>
+        <bodyName>MPU_9250</bodyName>
+        <updateRateHZ>20.0</updateRateHZ>
+        <gaussianNoise>0.0</gaussianNoise>
+        <xyzOffset>0 0 0</xyzOffset>
+        <rpyOffset>0 0 0</rpyOffset>
+        <frameName>MPU_9250</frameName>
+        <initialOrientationAsReference>false</initialOrientationAsReference>
+      </plugin>
+      <pose>0 0 0 0 0 0</pose>
     </sensor>
   </gazebo>
 
