@@ -1,7 +1,6 @@
 import rospy
 import numpy as np
 from sensor_msgs.msg import LaserScan
-from sensor_msgs.point_cloud2 import read_points
 from tf.transformations import quaternion_from_matrix
 from sklearn.neighbors import NearestNeighbors
 from geometry_msgs.msg import PoseStamped
@@ -69,23 +68,24 @@ class LidarICP:
 
         R, T = self.calculate_icp_transformation(source, matched_target)
 
-        return R, T
+        return np.round(R, 3), np.round(T, 3)
 
     def calculate_icp_transformation(self, source, target):
-        mean_source = np.mean(source, axis=0)
-        mean_target = np.mean(target, axis=0)
+        mean_source = np.mean(source, axis=0)  # source is the current scan
+        mean_target = np.mean(target, axis=0)  # target is the current scan
 
         centered_source = source - mean_source
         centered_target = target - mean_target
 
         W = np.dot(centered_source.T, centered_target)
-
+        
+        # Perform Singular Value Decomposition (SVD)
         U, _, Vt = np.linalg.svd(W)
 
         R = np.dot(Vt.T, U.T)
         T = mean_target - np.dot(R, mean_source)
 
-        return R, T
+        return np.round(R, 3), np.round(T, 3)
 
     def average_icp_transformations(self, current_scan):
         R_sum = np.zeros((3, 3))
@@ -99,15 +99,15 @@ class LidarICP:
         R_avg = R_sum / len(self.prev_scans)
         T_avg = T_sum / len(self.prev_scans)
 
-        return R_avg, T_avg
+        return np.round(R_avg, 3), np.round(T_avg, 3)
 
-    def update_pose(self, transformation_matrix):
+    def update_pose(self, transformation_matrix): # receives transformation matrix of the cummulative_transform
         updated_pose = PoseStamped()
         updated_pose.header.frame_id = "base_link"  # Change to your robot's frame
         updated_pose.header.stamp = rospy.Time.now()
 
         translation = transformation_matrix[:3, 3]
-        quaternion = quaternion_from_matrix(transformation_matrix)
+        quaternion = quaternion_from_matrix(transformation_matrix) 
 
         updated_pose.pose.position.x = translation[0]
         updated_pose.pose.position.y = translation[1]
