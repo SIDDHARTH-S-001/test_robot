@@ -229,7 +229,7 @@
     </sensor>
   </gazebo>
 
-  <gazebo reference="MPU_9250">
+  <!-- <gazebo reference="MPU_9250">
     <gravity>true</gravity>
     <sensor name="imu_sensor" type="imu">
       <always_on>true</always_on>
@@ -248,6 +248,17 @@
       </plugin>
       <pose>0 0 0 0 0 0</pose>
     </sensor>
+  </gazebo> -->
+
+  <gazebo>
+    <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>base_link</bodyName>
+      <topicName>imu</topicName>
+      <serviceName>imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>20.0</updateRate>
+    </plugin>
   </gazebo>
 
 </robot>

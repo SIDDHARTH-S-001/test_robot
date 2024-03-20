@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 import numpy as np
@@ -20,7 +20,7 @@ class LidarICP:
         self.prev_scan = None
 
     def scan_callback(self, scan_msg):
-        current_scan = self.laser_scan_to_point_cloud(scan_msg)
+        current_scan = self.laser_scan_to_point_cloud(scan_msg) # current_scan is an array of points
         
         if self.prev_scan is not None:
             # Apply ICP
@@ -57,12 +57,13 @@ class LidarICP:
         matched_target = target[indices.flatten()]
         
         # Compute the transformation
-        R, T = self.calculate_icp_transformation(source, matched_target)
+        R, T = self.calculate_icp_transformation(source, matched_target) # prev_scan is the source and current_scan is target
 
         return R, T
 
     def calculate_icp_transformation(self, source, target):
         # Calculate the transformation between source and target using SVD
+        # prev_scan is the source and current_scan is target
         mean_source = np.mean(source, axis=0)
         mean_target = np.mean(target, axis=0)
 
@@ -81,9 +82,9 @@ class LidarICP:
     def update_pose(self, R, T):
         try:
             # Get the current robot pose from the TF tree
-            trans = self.tf_buffer.lookup_transform("map", "base_link", rospy.Time(0))
+            trans = self.tf_buffer.lookup_transform("odom", "base_link", rospy.Time(0))
             pose = PoseStamped()
-            pose.header.frame_id = "map"
+            pose.header.frame_id = "odom"
             pose.pose.position.x = trans.transform.translation.x
             pose.pose.position.y = trans.transform.translation.y
             pose.pose.position.z = trans.transform.translation.z
@@ -108,7 +109,7 @@ class LidarICP:
 
         # Apply the ICP transformation
         updated_pose = PoseStamped()
-        updated_pose.header.frame_id = "map"
+        updated_pose.header.frame_id = "odom"
         updated_pose.header.stamp = rospy.Time.now()
         updated_pose.pose.position.x = pose.pose.position.x + T[0]
         updated_pose.pose.position.y = pose.pose.position.y + T[1]

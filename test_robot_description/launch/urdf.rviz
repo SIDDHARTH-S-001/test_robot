@@ -1,12 +1,13 @@
 Panels:
   - Class: rviz/Displays
-    Help Height: 85
+    Help Height: 138
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global1/Global_Costmap1
+        - /Global Options1
+        - /Global1
       Splitter Ratio: 0.5
-    Tree Height: 818
+    Tree Height: 1922
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -55,11 +56,31 @@ Visualization Manager:
       Collision Enabled: false
       Enabled: true
       Links:
+        ADXL335:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        MPU_6050:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        MPU_9250:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        QMC5883:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         base_link:
           Alpha: 1
           Show Axes: false
@@ -113,6 +134,8 @@ Visualization Manager:
       Visual Enabled: true
     - Class: rviz/TF
       Enabled: false
+      Filter (blacklist): ""
+      Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
         All Enabled: true
@@ -165,15 +188,26 @@ Visualization Manager:
       Unreliable: false
       Value: false
       Visibility:
-        "": true
+        Current_Goal: true
+        Global:
+          Global_Costmap: true
+          Global_Planner: true
+          Value: true
         Grid: true
+        Image: true
         LaserScan: true
+        Local:
+          Local_Costmap: true
+          Local_Planner: true
+          Value: true
+        Map: true
+        PoseWithCovariance: true
         RobotModel: true
         TF: true
         Value: true
       Zoom Factor: 1
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /camera/image_raw
       Max Value: 1
       Median window: 5
@@ -183,7 +217,7 @@ Visualization Manager:
       Queue Size: 2
       Transport Hint: raw
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 0.699999988079071
       Class: rviz/Map
       Color Scheme: map
@@ -214,8 +248,8 @@ Visualization Manager:
           Head Diameter: 0.30000001192092896
           Head Length: 0.20000000298023224
           Length: 0.30000001192092896
-          Line Style: Lines
-          Line Width: 0.029999999329447746
+          Line Style: Billboards
+          Line Width: 0.05000000074505806
           Name: Global_Planner
           Offset:
             X: 0
@@ -286,11 +320,42 @@ Visualization Manager:
       Topic: /move_base/current_goal
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz/PoseWithCovariance
+      Color: 255; 25; 0
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: false
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: PoseWithCovariance
+      Queue Size: 10
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Arrow
+      Topic: /poseupdate
+      Unreliable: false
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: map
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -314,7 +379,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10.252433776855469
+      Distance: 29.511550903320312
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -322,29 +387,29 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.03674514964222908
-        Y: -0.575690746307373
-        Z: 0.20654432475566864
+        X: 0.11246103793382645
+        Y: -0.8399638533592224
+        Z: 0.31754136085510254
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4903960227966309
+      Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 0.01858295500278473
+      Yaw: 3.1417672634124756
     Saved: ~
 Window Geometry:
   Camera:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1529
+  Height: 2432
   Hide Left Dock: false
   Hide Right Dock: false
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001fe00000546fc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006e00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000047000003ce000000f100fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610000000247000000bf0000001900fffffffb0000000a0049006d006100670065010000041c000001710000001900ffffff000000010000010f00000546fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000004700000546000000c200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000009b000000044fc0100000002fb0000000800540069006d00650100000000000009b00000045a00fffffffb0000000800540069006d00650100000000000004500000000000000000000006950000054600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000003110000087afc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000006e0000087a0000018200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610000000247000000bf0000002600fffffffb0000000a0049006d0061006700650000000408000001590000002600ffffff000000010000015f0000087afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000006e0000087a0000013200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000f6c0000005efc0100000002fb0000000800540069006d0065010000000000000f6c000006dc00fffffffb0000000800540069006d0065010000000000000450000000000000000000000ae40000087a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -353,6 +418,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2480
-  X: 80
-  Y: 34
+  Width: 3948
+  X: 148
+  Y: 54

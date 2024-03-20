@@ -1,0 +1,13 @@
+<launch>
+  <!-- Start laser_scan_matcher node -->
+  <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" output="screen">
+    <param name="laser_scan_topic" type="string" value="/scan"/>
+    <param name="imu_topic" type="string" value="/imu"/>
+    <param name="odom_frame" type="string" value="odom"/>
+    <param name="base_frame" type="string" value="base_link"/>
+    <!-- <param name="fixed_frame" type="string" value="map"/> -->
+    <param name="use_odom" type="string" value="false"/>
+    <param name="use_imu" type="string" value="true"/>
+    <param name="max_iterations" type="string" value="10"/>
+  </node>
+</launch>

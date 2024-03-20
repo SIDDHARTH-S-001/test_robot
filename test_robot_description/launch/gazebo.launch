@@ -11,6 +11,4 @@
     <arg name="debug" value="false"/>
   </include>
 
-  <include file="$(find test_robot_description)/launch/controller.launch"/>
-
 </launch>
