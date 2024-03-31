@@ -3,12 +3,13 @@
 # This is for a two wheel differential drive robot
 import rospy
 from std_msgs.msg import Float64, Header
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, TransformStamped
 import numpy as np
 from sensor_msgs.msg import JointState
 from math import cos, sin
 from nav_msgs.msg import Odometry
 import tf_conversions
+from tf2_ros import TransformBroadcaster
 
 
 class SimpleController(object):
@@ -29,11 +30,17 @@ class SimpleController(object):
         
         self.odom_msg = Odometry()
         self.odom_msg.header.frame_id = "odom"
-        self.odom_msg.child_frame_id = "base_footprint"
+        self.odom_msg.child_frame_id = "base_link"
         self.odom_msg.pose.pose.orientation.x = 0.0
         self.odom_msg.pose.pose.orientation.y = 0.0
         self.odom_msg.pose.pose.orientation.z = 0.0
         self.odom_msg.pose.pose.orientation.w = 1.0
+
+        self.odom_br = TransformBroadcaster()
+        self.tf_stamped = TransformStamped()
+        self.tf_stamped.header.frame_id = "odom"
+        self.tf_stamped.child_frame_id = "base_footprint"
+
         
         self.right_cmd_pub = rospy.Publisher("wheel_right_controller/command", Float64, queue_size=10)
         self.left_cmd_pub = rospy.Publisher("wheel_left_controller/command", Float64, queue_size=10)
@@ -92,6 +99,16 @@ class SimpleController(object):
         self.odom_msg.twist.twist.angular.z = angular_vel
 
         self.odom_pub.publish(self.odom_msg)
+
+        self.tf_stamped.transform.translation.x = self.x
+        self.tf_stamped.transform.translation.y = self.y
+        self.tf_stamped.transform.rotation.x = q[0]
+        self.tf_stamped.transform.rotation.y = q[1]
+        self.tf_stamped.transform.rotation.z = q[2]
+        self.tf_stamped.transform.rotation.w = q[3]
+        self.tf_stamped.header.stamp = rospy.Time.now()
+
+        self.odom_br.sendTransform(self.tf_stamped)
 
         # rospy.loginfo("Linear: %f  angular: %f x: %f y: %f theta: %f", linear_vel, angular_vel, self.x, self.y, self.theta)
 
