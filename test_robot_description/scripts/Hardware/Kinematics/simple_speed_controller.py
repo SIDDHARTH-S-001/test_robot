@@ -39,7 +39,7 @@ class SimpleController(object):
         self.odom_br = TransformBroadcaster()
         self.tf_stamped = TransformStamped()
         self.tf_stamped.header.frame_id = "odom"
-        self.tf_stamped.child_frame_id = "base_footprint"
+        self.tf_stamped.child_frame_id = "base_link"
 
         
         self.right_cmd_pub = rospy.Publisher("wheel_right_controller/command", Float64, queue_size=10)
