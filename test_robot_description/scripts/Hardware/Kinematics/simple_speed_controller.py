@@ -10,8 +10,8 @@ from math import cos, sin
 
 class SimpleController(object):
     def __init__(self, wheel_radius, wheel_sepration):
-        rospy.loginfo("Wheel Radius (r): ", wheel_radius)
-        rospy.loginfo("Wheel Sepration (s): ", wheel_sepration)
+        # rospy.loginfo("Wheel Radius (r): ", wheel_radius)
+        # rospy.loginfo("Wheel Sepration (s): ", wheel_sepration)
 
         self.w_rad = wheel_radius
         self.w_sep = wheel_sepration
@@ -48,7 +48,7 @@ class SimpleController(object):
 
     def joint_state_callbak(self, msg):
         dp_left = msg.position[0] - self.left_wheel_prev_pos
-        dp_right = msg.positoin[1] - self.right_wheel_prev_pos
+        dp_right = msg.position[1] - self.right_wheel_prev_pos
         dt = (msg.header.stamp - self.prev_time).to_sec()
 
         self.left_wheel_prev_pos = msg.position[0]
@@ -73,8 +73,10 @@ class SimpleController(object):
 
 if __name__=="__main__":
     rospy.init_node("Simple_Controller_Node", anonymous=True)
-    wheel_radius = rospy.get_param("~wheel_radius")
-    wheel_sepration = rospy.get_param("~wheel_sepration")
+    # wheel_radius = rospy.get_param("~wheel_radius")
+    # wheel_sepration = rospy.get_param("~wheel_sepration")
+    wheel_radius = 0.05
+    wheel_sepration = 0.3
     controller = SimpleController(wheel_radius, wheel_sepration)
 
     rospy.spin()
