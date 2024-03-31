@@ -2,11 +2,14 @@
 
 # This is for a two wheel differential drive robot
 import rospy
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Header
 from geometry_msgs.msg import Twist
 import numpy as np
 from sensor_msgs.msg import JointState
 from math import cos, sin
+from nav_msgs.msg import Odometry
+import tf_conversions
+
 
 class SimpleController(object):
     def __init__(self, wheel_radius, wheel_sepration):
@@ -24,16 +27,25 @@ class SimpleController(object):
         self.y = 0.0
         self.theta = 0.0
         
+        self.odom_msg = Odometry()
+        self.odom_msg.header.frame_id = "odom"
+        self.odom_msg.child_frame_id = "base_footprint"
+        self.odom_msg.pose.pose.orientation.x = 0.0
+        self.odom_msg.pose.pose.orientation.y = 0.0
+        self.odom_msg.pose.pose.orientation.z = 0.0
+        self.odom_msg.pose.pose.orientation.w = 1.0
+        
         self.right_cmd_pub = rospy.Publisher("wheel_right_controller/command", Float64, queue_size=10)
         self.left_cmd_pub = rospy.Publisher("wheel_left_controller/command", Float64, queue_size=10)
+        self.odom_pub = rospy.Publisher("test_robot/odom", Odometry, queue_size=10)
 
         self.vel_sub = rospy.Subscriber("/cmd_vel", Twist, self.vel_callback)
         self.joint_sub = rospy.Subscriber("/joint_states", JointState, self.joint_state_callbak)
-
-        self.speed_conversion_matrix = np.array([wheel_radius/2, wheel_radius/2], 
-                                                [wheel_radius/wheel_sepration, -wheel_radius/wheel_sepration])
         
-        rospy.loginfo("Conversion Matrix is: ", self.speed_conversion_matrix)     
+        self.speed_conversion_matrix = np.array([[wheel_radius/2, wheel_radius/2],
+                                          [wheel_radius/wheel_sepration, -wheel_radius/wheel_sepration]])
+
+        # rospy.loginfo("Conversion Matrix is: ", self.speed_conversion_matrix)     
 
     def vel_callback(self, msg):
         robot_speed = np.array([msg.linear.x], 
@@ -68,8 +80,20 @@ class SimpleController(object):
         self.x += ds * cos(self.theta)
         self.y = ds * sin(self.theta)
 
-        rospy.loginfo("Linear: %f  angular: %f x: %f y: %f theta: %f", linear_vel, angular_vel, self.x, self.y, self.theta)
+        q = tf_conversions.transformations.quaternion_from_euler(0, 0, self.theta)
+        self.odom_msg.pose.pose.orientation.x = q[0]
+        self.odom_msg.pose.pose.orientation.y = q[1]
+        self.odom_msg.pose.pose.orientation.z = q[2]
+        self.odom_msg.pose.pose.orientation.w = q[3]
+        self.odom_msg.header.stamp = rospy.Time.now()
+        self.odom_msg.pose.pose.position.x = self.x
+        self.odom_msg.pose.pose.position.y = self.y
+        self.odom_msg.twist.twist.linear.x = linear_vel
+        self.odom_msg.twist.twist.angular.z = angular_vel
 
+        self.odom_pub.publish(self.odom_msg)
+
+        # rospy.loginfo("Linear: %f  angular: %f x: %f y: %f theta: %f", linear_vel, angular_vel, self.x, self.y, self.theta)
 
 if __name__=="__main__":
     rospy.init_node("Simple_Controller_Node", anonymous=True)
