@@ -6,6 +6,7 @@ from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
 import numpy as np
 from sensor_msgs.msg import JointState
+from math import cos, sin
 
 class SimpleController(object):
     def __init__(self, wheel_radius, wheel_sepration):
@@ -17,6 +18,11 @@ class SimpleController(object):
         self.left_wheel_prev_pos = 0.0
         self.right_wheel_prev_pos = 0.0
         self.prev_time = rospy.Time.now()
+
+        # Initial Pose
+        self.x = 0.0
+        self.y = 0.0
+        self.theta = 0.0
         
         self.right_cmd_pub = rospy.Publisher("wheel_right_controller/command", Float64, queue_size=10)
         self.left_cmd_pub = rospy.Publisher("wheel_left_controller/command", Float64, queue_size=10)
@@ -52,11 +58,17 @@ class SimpleController(object):
         phi_left = dp_left/dt
         phi_right = dp_right/dt
 
-        linear_vel = self.w_rad * (phi_right + phi_left) / 2
+        linear_vel = (self.w_rad / 2) * (phi_right + phi_left)
         angular_vel = (self.w_rad / self.w_sep) * (phi_right - phi_left)
 
-        rospy.loginfo("Linear Velocity (V) : ", float(linear_vel))
-        rospy.loginfo("Angular Velocity (W) : ", float(angular_vel))
+        ds = (self.w_rad / 2) * (dp_right + dp_left) 
+        dtheta = (self.w_rad / self.w_sep) * (dp_right - dp_left)
+
+        self.theta += dtheta
+        self.x += ds * cos(self.theta)
+        self.y = ds * sin(self.theta)
+
+        rospy.loginfo("Linear: %f  angular: %f x: %f y: %f theta: %f", linear_vel, angular_vel, self.x, self.y, self.theta)
 
 
 if __name__=="__main__":
