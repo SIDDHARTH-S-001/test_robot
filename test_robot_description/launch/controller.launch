@@ -1,4 +1,6 @@
 <launch>
+<arg name="wheel_radius" default="0.1"/>
+<arf name="wheel_sepration" default="0.3"/> 
 
 <rosparam file="$(find test_robot_description)/param/controller.yaml" command="load"/>
 
@@ -8,5 +10,10 @@
 <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
   <remap from="/joint_states" to="/test_robot/joint_states"/>
 </node>
+
+<node name="test_robot_description" type="simple_speed_controller.py" name="Simple_Controller_Node"
+      respawn="true" output="screen">
+      <param name="wheel_radius" value="$(arg wheel_radius)"/>
+      <param name="wheel_sepration" value="$(arg wheel_sepration)"/>
 
 </launch>
