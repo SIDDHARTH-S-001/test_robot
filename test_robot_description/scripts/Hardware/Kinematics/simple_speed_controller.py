@@ -1,18 +1,28 @@
 #!/usr/bin/env python3
+
+# This is for a two wheel differential drive robot
 import rospy
 from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
 import numpy as np
+from sensor_msgs.msg import JointState
 
 class SimpleController(object):
     def __init__(self, wheel_radius, wheel_sepration):
         rospy.loginfo("Wheel Radius (r): ", wheel_radius)
         rospy.loginfo("Wheel Sepration (s): ", wheel_sepration)
 
+        self.w_rad = wheel_radius
+        self.w_sep = wheel_sepration
+        self.left_wheel_prev_pos = 0.0
+        self.right_wheel_prev_pos = 0.0
+        self.prev_time = rospy.Time.now()
+        
         self.right_cmd_pub = rospy.Publisher("wheel_right_controller/command", Float64, queue_size=10)
         self.left_cmd_pub = rospy.Publisher("wheel_left_controller/command", Float64, queue_size=10)
 
         self.vel_sub = rospy.Subscriber("/cmd_vel", Twist, self.vel_callback)
+        self.joint_sub = rospy.Subscriber("/joint_states", JointState, self.joint_state_callbak)
 
         self.speed_conversion_matrix = np.array([wheel_radius/2, wheel_radius/2], 
                                                 [wheel_radius/wheel_sepration, -wheel_radius/wheel_sepration])
@@ -29,6 +39,24 @@ class SimpleController(object):
 
         self.right_cmd_pub.publish(right_speed)
         self.left_cmd_pub.publish(left_speed)
+
+    def joint_state_callbak(self, msg):
+        dp_left = msg.position[0] - self.left_wheel_prev_pos
+        dp_right = msg.positoin[1] - self.right_wheel_prev_pos
+        dt = (msg.header.stamp - self.prev_time).to_sec()
+
+        self.left_wheel_prev_pos = msg.position[0]
+        self.right_wheel_prev_pos = msg.position[1]
+        self.prev_time = msg.header.stamp
+
+        phi_left = dp_left/dt
+        phi_right = dp_right/dt
+
+        linear_vel = self.w_rad * (phi_right + phi_left) / 2
+        angular_vel = (self.w_rad / self.w_sep) * (phi_right - phi_left)
+
+        rospy.loginfo("Linear Velocity (V) : ", float(linear_vel))
+        rospy.loginfo("Angular Velocity (W) : ", float(angular_vel))
 
 
 if __name__=="__main__":
