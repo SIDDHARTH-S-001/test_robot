@@ -1,4 +1,4 @@
-#/usr/env/bin python3
+#!/usr/bin/env python3
 import rospy
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
