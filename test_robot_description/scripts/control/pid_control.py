@@ -42,12 +42,9 @@ if __name__ == "__main__":
     # state the values of the follwing in the format [value, lower limit, upper limit]
     kp = [1.0, -100.0, 100.0]
     ki = [0.001, -0.1, 0.1]
-    kd = [0.0001, -0.1, 0.1]    
+    kd = [0.00001, -0.1, 0.1]    
     
     pid = PIDController(kp, ki, kd, setpoint)  # Initialize PID controller with parameters
-    
-    # Simulate a process
-    
 
     while True:
         control_signal = pid.update(feedback, controller_sampling_time)
@@ -57,4 +54,4 @@ if __name__ == "__main__":
         
         print("Control signal:", control_signal, "Feedback:", feedback)
         
-        time.sleep(0.1)  # Sample time delay
+        time.sleep(controller_sampling_time)  # Sample time delay
