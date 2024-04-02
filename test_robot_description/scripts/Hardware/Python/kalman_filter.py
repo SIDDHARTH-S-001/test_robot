@@ -39,7 +39,7 @@ class KalmanFilter(object):
 
         self.kalman_odom.twist.twist.angular.z = self.mean
 
-        self.odom_pub(self.kalman_odom)
+        self.odom_pub.publish(self.kalman_odom)
 
         self.last_angular_z = odom.twist.twist.angular.z
 
@@ -53,7 +53,7 @@ class KalmanFilter(object):
         self.variance = self.variance + self.motion_variance
 
 
-if __name__ == "_main__":
+if __name__ == "__main__":
     rospy.init_node("kalman_filter_node")
     kf = KalmanFilter()
     rospy.spin()
