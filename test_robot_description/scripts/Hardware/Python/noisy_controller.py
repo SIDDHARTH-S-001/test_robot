@@ -25,7 +25,7 @@ class NoisyController(object):
         
         self.odom_msg = Odometry()
         self.odom_msg.header.frame_id = "odom"
-        self.odom_msg.child_frame_id = "base_link_ekf"
+        self.odom_msg.child_frame_id = "base_footprint_ekf"
         self.odom_msg.pose.pose.orientation.x = 0.0
         self.odom_msg.pose.pose.orientation.y = 0.0
         self.odom_msg.pose.pose.orientation.z = 0.0
@@ -34,7 +34,7 @@ class NoisyController(object):
         self.odom_br = TransformBroadcaster()
         self.tf_stamped = TransformStamped()
         self.tf_stamped.header.frame_id = "odom"
-        self.tf_stamped.child_frame_id = "base_link_noisy"
+        self.tf_stamped.child_frame_id = "base_footprint_noisy"
 
         self.odom_pub = rospy.Publisher("test_robot/odom_noisy", Odometry, queue_size=10)
 
