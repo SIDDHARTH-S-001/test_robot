@@ -253,11 +253,11 @@
   <gazebo>
     <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
       <alwaysOn>true</alwaysOn>
-      <bodyName>base_link</bodyName>
+      <bodyName>MPU_9250</bodyName>
       <topicName>imu</topicName>
       <serviceName>imu_service</serviceName>
-      <gaussianNoise>0.0</gaussianNoise>
-      <updateRate>20.0</updateRate>
+      <gaussianNoise>0.001</gaussianNoise>
+      <updateRate>1000.0</updateRate>
     </plugin>
   </gazebo>
 
