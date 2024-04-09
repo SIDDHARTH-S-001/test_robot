@@ -70,12 +70,20 @@ class LidarICP:
         centered_source = source - mean_source
         centered_target = target - mean_target
 
+        shape_val = source.shape[1] # get number of dimensions
+
         W = np.dot(centered_source.T, centered_target)
 
         U, _, Vt = np.linalg.svd(W)
 
         R = np.dot(Vt.T, U.T)
-        T = mean_target - np.dot(R, mean_source)
+
+        # special reflection case
+        if np.linalg.det(R) < 0:
+            Vt[shape_val-1,:] *= -1
+            R = np.dot(Vt.T, U.T)
+
+        T = mean_target.T - np.dot(R, mean_source.T)
 
         return R, T
 
