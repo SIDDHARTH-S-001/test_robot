@@ -73,6 +73,7 @@ class LidarICP:
             Vt[shape_val-1,:] *= -1
             R_val = np.dot(Vt.T, U.T)
         t = mean_target - np.dot(R_val, mean_source)
+        
 
         R = np.zeros((3, 3))
         R[:2, :2] = R_val
@@ -83,15 +84,17 @@ class LidarICP:
         H[:2, 3] = t
         H[3, 3] = 1
 
-        print('H: ', np.round(H, 3))
+        # print('H: ', np.round(H, 3))
 
         return np.round(H, 3),np.round(R, 3), np.round(t, 3)
     
     def update_pose(self,H, R, t):
         # Update the pose with the ICP transformation
         self.H_mat *= H
-        trans = H[:3, 3]
+        trans = np.zeros((3, 1))
+        trans[:3, 0] = H[:3, 3]
         Rot = H[:3, :3]
+        # print(trans.shape, Rot.shape)
         self.odom_icp_pose.pose.position.x = trans[0][0]
         self.odom_icp_pose.pose.position.y = trans[1][0]
         updated_yaw = np.arctan2(Rot[1, 0], Rot[0, 0])  # Extracting rotation from the transformation matrix
