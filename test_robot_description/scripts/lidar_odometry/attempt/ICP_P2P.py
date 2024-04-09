@@ -70,16 +70,16 @@ class LidarICP:
         W = np.dot(centered_source.T, centered_target)
         U, _, Vt = np.linalg.svd(W)
         R_val = np.dot(Vt.T, U.T)
-        t = np.zeros((2, 1))
+        t = np.zeros((2, ))
         # special reflection case
         if np.linalg.det(R_val) < 0:
             Vt[shape_val-1,:] *= -1
             R_val = np.dot(Vt.T, U.T)
-        t_temp = mean_target - np.dot(R_val, mean_source)
+        t_temp = mean_target - np.dot(R_val, mean_source) # temporary translational matrix
 
         if math.sqrt((t_temp[0]**2) + (t_temp[1]**2)) > self.dist_threshold:
-            t = t_temp        # translational matrix
-
+            t = t_temp      
+            
         R = np.zeros((3, 3)) # rotational matrix
         R[:2, :2] = R_val
         R[2, 2] = 1
