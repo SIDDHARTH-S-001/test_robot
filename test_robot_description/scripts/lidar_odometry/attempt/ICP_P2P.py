@@ -21,7 +21,7 @@ class LidarICP:
         self.odom_icp_pose = PoseStamped()  # Initialize odom_icp pose to zeros
         self.odom_icp_pose.header.frame_id = "odom_icp"
         self.H_mat = np.identity(4)
-        self.dist_threshold = 0.05
+        self.dist_threshold = 0.01
 
     def scan_callback(self, scan_msg):
         current_scan = self.laser_scan_to_point_cloud(scan_msg) # current_scan is an array of points        
@@ -77,9 +77,9 @@ class LidarICP:
             R_val = np.dot(Vt.T, U.T)
         t_temp = mean_target - np.dot(R_val, mean_source) # temporary translational matrix
 
-        if math.sqrt((t_temp[0]**2) + (t_temp[1]**2)) > self.dist_threshold:
+        if math.sqrt((t_temp[0]**2) + (t_temp[1]**2)) >= self.dist_threshold:
             t = t_temp      
-            
+
         R = np.zeros((3, 3)) # rotational matrix
         R[:2, :2] = R_val
         R[2, 2] = 1
@@ -103,6 +103,7 @@ class LidarICP:
         self.odom_icp_pose.pose.position.x = trans[0][0]
         self.odom_icp_pose.pose.position.y = trans[1][0]
         updated_yaw = np.arctan2(Rot[1, 0], Rot[0, 0])  # Extracting rotation from the transformation matrix
+        print(updated_yaw*180/3.1416)
         q = quaternion_from_euler(0, 0, updated_yaw)
         self.odom_icp_pose.pose.orientation.x = q[0]
         self.odom_icp_pose.pose.orientation.y = q[1]
@@ -113,9 +114,10 @@ class LidarICP:
         self.pose_pub.publish(self.odom_icp_pose)
 
     def run(self):
-        rospy.spin()
+        rate = rospy.Rate(5)
+        while not rospy.is_shutdown():
+            rate.sleep()
 
 if __name__ == '__main__':
     lidar_icp = LidarICP()
-
     lidar_icp.run()
