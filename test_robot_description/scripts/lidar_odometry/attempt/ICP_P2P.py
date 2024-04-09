@@ -8,6 +8,7 @@ from sklearn.neighbors import NearestNeighbors
 from geometry_msgs.msg import PoseStamped
 import tf2_ros
 import tf2_geometry_msgs
+import math
 
 class LidarICP:
     def __init__(self):
@@ -20,6 +21,7 @@ class LidarICP:
         self.odom_icp_pose = PoseStamped()  # Initialize odom_icp pose to zeros
         self.odom_icp_pose.header.frame_id = "odom_icp"
         self.H_mat = np.identity(4)
+        self.dist_threshold = 0.05
 
     def scan_callback(self, scan_msg):
         current_scan = self.laser_scan_to_point_cloud(scan_msg) # current_scan is an array of points        
@@ -68,14 +70,17 @@ class LidarICP:
         W = np.dot(centered_source.T, centered_target)
         U, _, Vt = np.linalg.svd(W)
         R_val = np.dot(Vt.T, U.T)
+        t = np.zeros((2, 1))
         # special reflection case
         if np.linalg.det(R_val) < 0:
             Vt[shape_val-1,:] *= -1
             R_val = np.dot(Vt.T, U.T)
-        t = mean_target - np.dot(R_val, mean_source)
-        
+        t_temp = mean_target - np.dot(R_val, mean_source)
 
-        R = np.zeros((3, 3))
+        if math.sqrt((t_temp[0]**2) + (t_temp[1]**2)) > self.dist_threshold:
+            t = t_temp        # translational matrix
+
+        R = np.zeros((3, 3)) # rotational matrix
         R[:2, :2] = R_val
         R[2, 2] = 1
 
