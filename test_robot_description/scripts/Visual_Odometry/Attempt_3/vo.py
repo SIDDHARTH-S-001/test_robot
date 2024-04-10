@@ -66,7 +66,6 @@ class ORBFeatureDetector:
 
         return good_matches
 
-
 if __name__ == "__main__":
     detector = ORBFeatureDetector()
     detector.detect_features()
