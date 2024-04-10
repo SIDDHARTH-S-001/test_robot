@@ -9,6 +9,7 @@ class ORBFeatureDetector:
         self.prev_keypoints = None
         self.prev_descriptors = None
         self.camera_matrix = np.loadtxt(camera_matrix_file)
+        self.transformation_matrices = []  # List to store transformation matrices for moving average
 
     def detect_features(self):
         start_time = time.time()
@@ -28,7 +29,15 @@ class ORBFeatureDetector:
                     # Compute essential matrix and egomotion
                     T = self.compute_egomotion(keypoints, matches)
                     print(T)
+                    self.transformation_matrices.append(T)  # Append the transformation matrix to the list
+                    if len(self.transformation_matrices) > 10:
+                        del self.transformation_matrices[0]  # Remove the oldest transformation matrix
                     
+                    # Compute moving average
+                    moving_avg = self.compute_moving_average()
+                    print("Moving Average Transformation Matrix:")
+                    print(moving_avg)
+
             self.prev_keypoints = keypoints
             self.prev_descriptors = descriptors
 
@@ -92,7 +101,15 @@ class ORBFeatureDetector:
         transformation_matrix[:3, :3] = R
         transformation_matrix[:3, 3] = t.flatten()
 
-        return transformation_matrix
+        return np.round(transformation_matrix, 2)
+    
+    def compute_moving_average(self):
+        # Compute the moving average of the last 5 transformation matrices
+        if len(self.transformation_matrices) > 0:
+            last_10_matrices = self.transformation_matrices[-10:]  # Get the last 5 matrices
+            return np.mean(last_10_matrices, axis=0)
+        else:
+            return None
     
 if __name__ == "__main__":
     detector = ORBFeatureDetector('camera_matrix.txt')
