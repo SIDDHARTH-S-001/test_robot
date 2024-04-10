@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+from collections import deque
 
 class ORBFeatureDetector:
     def __init__(self, camera_matrix_file):
@@ -9,8 +10,8 @@ class ORBFeatureDetector:
         self.prev_keypoints = None
         self.prev_descriptors = None
         self.camera_matrix = np.loadtxt(camera_matrix_file)
-        self.transformation_matrix = np.eye(4)  # Initialize with identity matrix for first iteration
-        self.alpha = 0.05  # Smoothing factor for exponential moving average
+        self.transformation_matrices = deque(maxlen=10)  # Buffer to store last 10 transformation matrices
+        self.alpha = 0.5  # Smoothing factor for exponential moving average
 
     def detect_features(self):
         start_time = time.time()
@@ -29,10 +30,10 @@ class ORBFeatureDetector:
                 if matches:
                     # Compute essential matrix and egomotion
                     T = self.compute_egomotion(keypoints, matches)
-                    self.transformation_matrix = self.smooth_transform(T)  # Apply smoothing
-                    
+                    self.transformation_matrices.append(T)  # Add new transformation to buffer
+                    smoothed_transform = self.smooth_transform()  # Apply smoothing
                     print("Smoothed Transformation Matrix:")
-                    print(self.transformation_matrix)
+                    print(smoothed_transform)
 
             self.prev_keypoints = keypoints
             self.prev_descriptors = descriptors
@@ -99,9 +100,14 @@ class ORBFeatureDetector:
 
         return np.round(transformation_matrix, 2)
 
-    def smooth_transform(self, new_transform):
-        # Apply exponential moving average to smooth the transformation matrix
-        smoothed_transform = self.alpha * new_transform + (1 - self.alpha) * self.transformation_matrix
+    def smooth_transform(self):
+        if len(self.transformation_matrices) == 0:
+            return np.eye(4)  # Return identity matrix if no transformations in buffer
+
+        # Apply exponential moving average to smooth the transformation matrices
+        smoothed_transform = self.transformation_matrices[0]  # Initialize with the first transformation
+        for i in range(1, len(self.transformation_matrices)):
+            smoothed_transform = self.alpha * self.transformation_matrices[i] + (1 - self.alpha) * smoothed_transform
         return np.round(smoothed_transform, 2)
     
 if __name__ == "__main__":
