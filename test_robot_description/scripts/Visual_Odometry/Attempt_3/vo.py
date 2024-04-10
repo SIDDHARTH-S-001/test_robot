@@ -3,13 +3,12 @@ import numpy as np
 import time
 
 class ORBFeatureDetector:
-    def __init__(self, camera_matrix_file, distortion_matrix_file):
+    def __init__(self, camera_matrix_file):
         self.orb = cv2.ORB_create(1000)
         self.cap = cv2.VideoCapture(0)
         self.prev_keypoints = None
         self.prev_descriptors = None
         self.camera_matrix = np.loadtxt(camera_matrix_file)
-        # self.distortion_matrix = np.loadtxt(distortion_matrix_file)
 
     def detect_features(self):
         start_time = time.time()
@@ -26,18 +25,12 @@ class ORBFeatureDetector:
             if self.prev_keypoints is not None and self.prev_descriptors is not None and keypoints is not None and descriptors is not None:
                 matches = self.match_features(descriptors)
                 if matches:
-                    # Draw matches
-                    frame_with_matches = cv2.drawMatches(self.prev_frame, self.prev_keypoints, frame, keypoints, matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-                    cv2.imshow('ORB Features with Matches', frame_with_matches)
-
-                    # Compute essential matrix
-                    E = self.compute_essential_matrix(keypoints, matches)
-                    print("Essential Matrix:")
-                    print(E)
-
+                    # Compute essential matrix and egomotion
+                    T = self.compute_egomotion(keypoints, matches)
+                    print(T)
+                    
             self.prev_keypoints = keypoints
             self.prev_descriptors = descriptors
-            self.prev_frame = frame.copy()
 
             # Calculate frame rate
             num_frames += 1
@@ -74,15 +67,23 @@ class ORBFeatureDetector:
 
         return good_matches
 
-    def compute_essential_matrix(self, keypoints, matches):
+    def compute_egomotion(self, keypoints, matches):
         points1 = np.float32([self.prev_keypoints[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
         points2 = np.float32([keypoints[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
 
         # Compute essential matrix
-        E, _ = cv2.findEssentialMat(points1, points2, self.camera_matrix, cv2.RANSAC, 0.999, 1.0, None)
+        E, mask = cv2.findEssentialMat(points1, points2, self.camera_matrix, cv2.RANSAC, 0.999, 1.0, None)
 
-        return E
+        # Recover pose from essential matrix
+        _, R, t, _ = cv2.recoverPose(E, points1, points2, self.camera_matrix)
+
+        # Compose the transformation matrix
+        transformation_matrix = np.eye(4)
+        transformation_matrix[:3, :3] = R
+        transformation_matrix[:3, 3] = t.flatten()
+
+        return transformation_matrix
 
 if __name__ == "__main__":
-    detector = ORBFeatureDetector('camera_matrix.txt', 'distortion_matrix.txt')
+    detector = ORBFeatureDetector('camera_matrix.txt')
     detector.detect_features()
