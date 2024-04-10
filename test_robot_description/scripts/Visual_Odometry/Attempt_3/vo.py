@@ -4,12 +4,13 @@ import time
 
 class ORBFeatureDetector:
     def __init__(self, camera_matrix_file):
-        self.orb = cv2.ORB_create(2500)
+        self.orb = cv2.ORB_create(1000)
         self.cap = cv2.VideoCapture(0)
         self.prev_keypoints = None
         self.prev_descriptors = None
         self.camera_matrix = np.loadtxt(camera_matrix_file)
-        self.transformation_matrices = []  # List to store transformation matrices for moving average
+        self.transformation_matrix = np.eye(4)  # Initialize with identity matrix for first iteration
+        self.alpha = 0.05  # Smoothing factor for exponential moving average
 
     def detect_features(self):
         start_time = time.time()
@@ -28,15 +29,10 @@ class ORBFeatureDetector:
                 if matches:
                     # Compute essential matrix and egomotion
                     T = self.compute_egomotion(keypoints, matches)
-                    print(T)
-                    self.transformation_matrices.append(T)  # Append the transformation matrix to the list
-                    if len(self.transformation_matrices) > 10:
-                        del self.transformation_matrices[0]  # Remove the oldest transformation matrix
+                    self.transformation_matrix = self.smooth_transform(T)  # Apply smoothing
                     
-                    # Compute moving average
-                    moving_avg = self.compute_moving_average()
-                    print("Moving Average Transformation Matrix:")
-                    print(moving_avg)
+                    print("Smoothed Transformation Matrix:")
+                    print(self.transformation_matrix)
 
             self.prev_keypoints = keypoints
             self.prev_descriptors = descriptors
@@ -91,25 +87,22 @@ class ORBFeatureDetector:
         points2 = points2.reshape(-1, 1, 2)
 
         # Compute essential matrix
-        E, mask = cv2.findEssentialMat(points1, points2, self.camera_matrix, cv2.RANSAC, 0.999, 1.0, None)
+        E, mask = cv2.findEssentialMat(points1, points2, self.camera_matrix, cv2.RANSAC, 0.999, 2.0, None)
 
         # Recover pose from essential matrix
         _, R, t, _ = cv2.recoverPose(E, points1, points2, self.camera_matrix)
 
         # Compose the transformation matrix
         transformation_matrix = np.eye(4)
-        transformation_matrix[:3, :3] = R
-        transformation_matrix[:3, 3] = t.flatten()
+        transformation_matrix[:3, :3] = np.round(R, 2)
+        transformation_matrix[:3, 3] = np.round(t.flatten(), 2)
 
         return np.round(transformation_matrix, 2)
-    
-    def compute_moving_average(self):
-        # Compute the moving average of the last 5 transformation matrices
-        if len(self.transformation_matrices) > 0:
-            last_10_matrices = self.transformation_matrices[-10:]  # Get the last 5 matrices
-            return np.mean(last_10_matrices, axis=0)
-        else:
-            return None
+
+    def smooth_transform(self, new_transform):
+        # Apply exponential moving average to smooth the transformation matrix
+        smoothed_transform = self.alpha * new_transform + (1 - self.alpha) * self.transformation_matrix
+        return np.round(smoothed_transform, 2)
     
 if __name__ == "__main__":
     detector = ORBFeatureDetector('camera_matrix.txt')
