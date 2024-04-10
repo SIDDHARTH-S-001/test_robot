@@ -4,7 +4,7 @@ import time
 
 class ORBFeatureDetector:
     def __init__(self, camera_matrix_file):
-        self.orb = cv2.ORB_create(1000)
+        self.orb = cv2.ORB_create(2500)
         self.cap = cv2.VideoCapture(0)
         self.prev_keypoints = None
         self.prev_descriptors = None
@@ -61,9 +61,12 @@ class ORBFeatureDetector:
         good_matches = []
         if matches is not None:
             if len(matches) > 0:  # Check if there are any matches
-                for m, n in matches:
-                    if m.distance < 0.7 * n.distance:
-                        good_matches.append(m)
+                for match_pair in matches:
+                    if len(match_pair) == 2:
+                        m, n = match_pair
+                        if m.distance < 0.7 * n.distance:
+                            good_matches.append(m)
+        return good_matches
 
         return good_matches
 
