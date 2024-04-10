@@ -68,11 +68,18 @@ class ORBFeatureDetector:
                             good_matches.append(m)
         return good_matches
 
-        return good_matches
-
     def compute_egomotion(self, keypoints, matches):
-        points1 = np.float32([self.prev_keypoints[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
-        points2 = np.float32([keypoints[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+        points1 = np.float32([self.prev_keypoints[m.queryIdx].pt for m in matches])
+        points2 = np.float32([keypoints[m.trainIdx].pt for m in matches])
+
+        # Reshape points1 and points2 if necessary
+        if not points1.flags['C_CONTIGUOUS']:
+            points1 = np.ascontiguousarray(points1)
+        if not points2.flags['C_CONTIGUOUS']:
+            points2 = np.ascontiguousarray(points2)
+
+        points1 = points1.reshape(-1, 1, 2)
+        points2 = points2.reshape(-1, 1, 2)
 
         # Compute essential matrix
         E, mask = cv2.findEssentialMat(points1, points2, self.camera_matrix, cv2.RANSAC, 0.999, 1.0, None)
@@ -86,7 +93,7 @@ class ORBFeatureDetector:
         transformation_matrix[:3, 3] = t.flatten()
 
         return transformation_matrix
-
+    
 if __name__ == "__main__":
     detector = ORBFeatureDetector('camera_matrix.txt')
     detector.detect_features()
