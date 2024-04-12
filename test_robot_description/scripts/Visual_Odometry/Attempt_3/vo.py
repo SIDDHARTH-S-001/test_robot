@@ -5,13 +5,13 @@ import math
 from collections import deque # double ended queue
 
 class ORBFeatureDetector:
-    def __init__(self, camera_matrix_file, distortion_matrix_file):
+    def __init__(self, camera_matrix_file):
         self.orb = cv2.ORB_create(1000) # max orb features detected will be 1000
         self.cap = cv2.VideoCapture(0)
         self.prev_keypoints = None
         self.prev_descriptors = None
         self.camera_matrix = np.loadtxt(camera_matrix_file) # loads camera matrix
-        self.distortion_matrix = np.loadtxt(distortion_matrix_file)
+        self.distortion_matrix = self.get_distortion_matrix()
         self.transformation_matrices = deque(maxlen=10)  # Buffer to store last 10 transformation matrices
         self.alpha = 0.9  # Smoothing factor for exponential moving average
         self.pose = np.eye(4)
@@ -20,6 +20,17 @@ class ORBFeatureDetector:
         self.prev_theta = 0.0
         self.distance_threshold = 0.05 # units: meters
         self.prev_position = None
+
+    def get_distortion_matrix(self):
+        k1 = 4.180186921932396715e-02 
+        k2 = 2.425581347765151108e+00 
+        k3 = 4.395410711636079694e-03 
+        p1 = -6.899778925917099577e-03 
+        p2 = -2.781548670044756832e+01
+
+        distortion_matrix = np.array([k1, k2, k3, p1, p2])
+
+        return distortion_matrix
 
     def detect_features(self):
         start_time = time.time()
@@ -175,5 +186,5 @@ class ORBFeatureDetector:
         return np.round(smoothed_transform, 2)
     
 if __name__ == "__main__":
-    detector = ORBFeatureDetector('camera_matrix.txt', 'distortion_matrix.txt')
+    detector = ORBFeatureDetector('camera_matrix.txt')
     detector.detect_features()
