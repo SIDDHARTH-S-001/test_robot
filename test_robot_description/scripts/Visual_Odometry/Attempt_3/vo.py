@@ -12,6 +12,7 @@ class ORBFeatureDetector:
         self.camera_matrix = np.loadtxt(camera_matrix_file) # loads camera matrix
         self.transformation_matrices = deque(maxlen=10)  # Buffer to store last 10 transformation matrices
         self.alpha = 0.9  # Smoothing factor for exponential moving average
+        self.pose = np.eye(4)
 
     def detect_features(self):
         start_time = time.time()
@@ -98,7 +99,10 @@ class ORBFeatureDetector:
         transformation_matrix[:3, :3] = np.round(R, 2)
         transformation_matrix[:3, 3] = np.round(t.flatten(), 2)
 
-        return np.round(transformation_matrix, 2)
+        # Final pose
+        self.pose *= np.round(transformation_matrix, 2)
+
+        return self.pose
 
     def smooth_transform(self):
         if len(self.transformation_matrices) == 0:
