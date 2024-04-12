@@ -119,6 +119,9 @@ class ORBFeatureDetector:
 
         # Recover pose from essential matrix
         _, R, t, _ = cv2.recoverPose(points1=points1, points2=points2, E=E, cameraMatrix=self.camera_matrix)
+        # Inside the compute_egomotion method
+        print("Translation shape:", t.shape)
+        print("Translation contents:", t)
 
         rot, trn = self.check_min_displacement(R, t)
 
@@ -141,7 +144,7 @@ class ORBFeatureDetector:
             rot = self.yaw_rotation_matrix(self.prev_theta)
 
         # Verify Translation based on constraint        
-        x, y, z = translation[0][1], translation[1][1], translation[2][1]        
+        x, y, z = translation[0][0], translation[1][0], translation[2][0]        
 
         if self.prev_position == None:
             self.prev_position = [0.0, 0.0, 0.0]
