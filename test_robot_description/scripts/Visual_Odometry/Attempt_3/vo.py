@@ -1,17 +1,17 @@
 import cv2
 import numpy as np
 import time
-from collections import deque
+from collections import deque # double ended queue
 
 class ORBFeatureDetector:
     def __init__(self, camera_matrix_file):
-        self.orb = cv2.ORB_create(1000)
+        self.orb = cv2.ORB_create(1000) # max orb features detected will be 1000
         self.cap = cv2.VideoCapture(0)
         self.prev_keypoints = None
         self.prev_descriptors = None
-        self.camera_matrix = np.loadtxt(camera_matrix_file)
+        self.camera_matrix = np.loadtxt(camera_matrix_file) # loads camera matrix
         self.transformation_matrices = deque(maxlen=10)  # Buffer to store last 10 transformation matrices
-        self.alpha = 0.5  # Smoothing factor for exponential moving average
+        self.alpha = 0.9  # Smoothing factor for exponential moving average
 
     def detect_features(self):
         start_time = time.time()
@@ -21,8 +21,8 @@ class ORBFeatureDetector:
             if not ret:
                 break
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            keypoints, descriptors = self.orb.detectAndCompute(gray, None)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # converting the frame to grayscale before detecting features
+            keypoints, descriptors = self.orb.detectAndCompute(gray, None) # detecting features and getting keypoints and descriptions
 
             # Match features with previous frame
             if self.prev_keypoints is not None and self.prev_descriptors is not None and keypoints is not None and descriptors is not None:
@@ -91,9 +91,9 @@ class ORBFeatureDetector:
         E, mask = cv2.findEssentialMat(points1, points2, self.camera_matrix, cv2.RANSAC, 0.999, 2.0, None)
 
         # Recover pose from essential matrix
-        _, R, t, _ = cv2.recoverPose(E, points1, points2, self.camera_matrix)
+        _, R, t, _ = cv2.recoverPose(points1=points1, points2=points2, E=E, cameraMatrix=self.camera_matrix)
 
-        # Compose the transformation matrix
+        # Compose the rigid body transformation matrix
         transformation_matrix = np.eye(4)
         transformation_matrix[:3, :3] = np.round(R, 2)
         transformation_matrix[:3, 3] = np.round(t.flatten(), 2)
