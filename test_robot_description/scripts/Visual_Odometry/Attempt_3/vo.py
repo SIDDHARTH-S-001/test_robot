@@ -155,7 +155,7 @@ class ORBFeatureDetector:
             if disp >= self.distance_threshold:
                 self.prev_position[0] = x
                 self.prev_position[1] = y
-                self.prev_position[3] = z
+                self.prev_position[2] = z
                 trn = translation
             else:
                 trn = np.array([self.prev_position])       
