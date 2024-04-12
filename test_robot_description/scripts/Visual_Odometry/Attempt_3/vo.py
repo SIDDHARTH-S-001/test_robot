@@ -31,10 +31,12 @@ class ORBFeatureDetector:
                 if matches:
                     # Compute essential matrix and egomotion
                     T = self.compute_egomotion(keypoints, matches)
+                    # Final pose
+                    self.pose *= T
                     self.transformation_matrices.append(T)  # Add new transformation to buffer
                     smoothed_transform = self.smooth_transform()  # Apply smoothing
                     print("Smoothed Transformation Matrix:")
-                    print(smoothed_transform)
+                    print(self.pose)
 
             self.prev_keypoints = keypoints
             self.prev_descriptors = descriptors
@@ -99,16 +101,13 @@ class ORBFeatureDetector:
         transformation_matrix[:3, :3] = np.round(R, 2)
         transformation_matrix[:3, 3] = np.round(t.flatten(), 2)
 
-        # Final pose
-        self.pose *= np.round(transformation_matrix, 2)
-
-        return self.pose
+        return np.round(transformation_matrix, 2)
 
     def smooth_transform(self):
         if len(self.transformation_matrices) == 0:
             return np.eye(4)  # Return identity matrix if no transformations in buffer
 
-        # Apply exponential moving average to smooth the transformation matrices
+        # Apply moving average to smooth the transformation matrices
         smoothed_transform = self.transformation_matrices[0]  # Initialize with the first transformation
         for i in range(1, len(self.transformation_matrices)):
             smoothed_transform = self.alpha * self.transformation_matrices[i] + (1 - self.alpha) * smoothed_transform
