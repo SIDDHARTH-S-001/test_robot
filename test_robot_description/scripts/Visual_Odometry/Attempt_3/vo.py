@@ -60,12 +60,15 @@ class ORBFeatureDetector:
                     # Final pose
                     self.pose *= smoothed_transform
                     rot = self.pose[:3, :3]
-                    trn = self.pose[:3, 3]
-                    angle = math.atan2(rot[1][0], rot[0][0]) * (180 / math.pi)
-                    x, y, z = trn[0][0], trn[1][0], trn[2][0]
+                    trn = self.pose[:3, 3].reshape(3, 1)
+                    angle = np.round(math.atan2(rot[1][0], rot[0][0]) * (180 / math.pi), 1)
+                    x, y, z = np.round(trn[0][0], 2), np.round(trn[1][0], 2), np.round(trn[2][0], 2)
 
-                    cv2.putText(frame, f'X: {x:.2f}, Y: {y:.2f}, Z: {z:.2f}, Angle: {angle:.2f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-
+                    cv2.putText(frame, f'X: {x:.2f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 1, cv2.LINE_AA)
+                    cv2.putText(frame, f'Y: {y:.2f}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 1, cv2.LINE_AA)
+                    cv2.putText(frame, f'Z: {z:.2f}', (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 1, cv2.LINE_AA)
+                    cv2.putText(frame, f'Ang: {angle:.2f}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 1, cv2.LINE_AA)
+                    
                     print("Smoothed Pose:")
                     print(np.round(self.pose, 2))
 
@@ -155,7 +158,7 @@ class ORBFeatureDetector:
 
         if self.prev_position == None:
             self.prev_position = [0.0, 0.0, 0.0]
-            trn = np.array([self.prev_position])
+            trn = np.array([self.prev_position]).reshape(3, 1)
         else:
             x0, y0, z0 = self.prev_position[0], self.prev_position[1], self.prev_position[2] 
             disp = math.sqrt((x-x0)**2 + (y-y0)**2 + (z-z0)**2)
@@ -165,7 +168,7 @@ class ORBFeatureDetector:
                 self.prev_position[2] = z
                 trn = translation
             else:
-                trn = np.array([self.prev_position])       
+                trn = np.array([self.prev_position]).reshape(3, 1)    
 
         return np.round(rot, 2), np.round(trn, 2)       
 
