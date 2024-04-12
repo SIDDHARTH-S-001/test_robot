@@ -4,12 +4,13 @@ import time
 from collections import deque # double ended queue
 
 class ORBFeatureDetector:
-    def __init__(self, camera_matrix_file):
+    def __init__(self, camera_matrix_file, distortion_matrix_file):
         self.orb = cv2.ORB_create(1000) # max orb features detected will be 1000
         self.cap = cv2.VideoCapture(0)
         self.prev_keypoints = None
         self.prev_descriptors = None
         self.camera_matrix = np.loadtxt(camera_matrix_file) # loads camera matrix
+        self.distortion_matrix = np.loadtxt(distortion_matrix_file)
         self.transformation_matrices = deque(maxlen=10)  # Buffer to store last 10 transformation matrices
         self.alpha = 0.9  # Smoothing factor for exponential moving average
         self.pose = np.eye(4)
@@ -22,8 +23,12 @@ class ORBFeatureDetector:
             if not ret:
                 break
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # converting the frame to grayscale before detecting features
-            keypoints, descriptors = self.orb.detectAndCompute(gray, None) # detecting features and getting keypoints and descriptions
+            # Remove distortions before detecting features
+            undistorted_frame = cv2.undistort(frame, self.camera_matrix, self.distortion_matrix)
+            # Converting the frame to grayscale before detecting features
+            gray = cv2.cvtColor(undistorted_frame, cv2.COLOR_BGR2GRAY) 
+            # Detecting features and getting keypoints and descriptions
+            keypoints, descriptors = self.orb.detectAndCompute(gray, None) 
 
             # Match features with previous frame
             if self.prev_keypoints is not None and self.prev_descriptors is not None and keypoints is not None and descriptors is not None:
@@ -31,11 +36,13 @@ class ORBFeatureDetector:
                 if matches:
                     # Compute essential matrix and egomotion
                     T = self.compute_egomotion(keypoints, matches)
+                    # Add new transformation to buffer
+                    self.transformation_matrices.append(T)  
+                    # Apply smoothing
+                    smoothed_transform = self.smooth_transform()  
                     # Final pose
-                    self.pose *= T
-                    self.transformation_matrices.append(T)  # Add new transformation to buffer
-                    smoothed_transform = self.smooth_transform()  # Apply smoothing
-                    print("Smoothed Transformation Matrix:")
+                    self.pose *= smoothed_transform
+                    print("Smoothed Pose:")
                     print(self.pose)
 
             self.prev_keypoints = keypoints
@@ -66,7 +73,7 @@ class ORBFeatureDetector:
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.prev_descriptors, descriptors, k=2)
 
-        # Apply ratio test
+        # Apply Lowe's ratio test (https://stackoverflow.com/questions/51197091/how-does-the-lowes-ratio-test-work)
         good_matches = []
         if matches is not None:
             if len(matches) > 0:  # Check if there are any matches
@@ -105,7 +112,8 @@ class ORBFeatureDetector:
 
     def smooth_transform(self):
         if len(self.transformation_matrices) == 0:
-            return np.eye(4)  # Return identity matrix if no transformations in buffer
+            # Return identity matrix if no transformations in buffer
+            return np.eye(4)  
 
         # Apply moving average to smooth the transformation matrices
         smoothed_transform = self.transformation_matrices[0]  # Initialize with the first transformation
@@ -114,5 +122,5 @@ class ORBFeatureDetector:
         return np.round(smoothed_transform, 2)
     
 if __name__ == "__main__":
-    detector = ORBFeatureDetector('camera_matrix.txt')
+    detector = ORBFeatureDetector('camera_matrix.txt', 'distortion_matrix.txt')
     detector.detect_features()
