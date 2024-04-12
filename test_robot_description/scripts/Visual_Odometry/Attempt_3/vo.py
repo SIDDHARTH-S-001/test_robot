@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+import math
 from collections import deque # double ended queue
 
 class ORBFeatureDetector:
@@ -14,6 +15,11 @@ class ORBFeatureDetector:
         self.transformation_matrices = deque(maxlen=10)  # Buffer to store last 10 transformation matrices
         self.alpha = 0.9  # Smoothing factor for exponential moving average
         self.pose = np.eye(4)
+        # verification variables
+        self.angle_threshold = 1 * (math.pi / 180)
+        self.prev_theta = 0.0
+        self.distance_threshold = 0.05 # units: meters
+        self.prev_position = None
 
     def detect_features(self):
         start_time = time.time()
@@ -37,7 +43,7 @@ class ORBFeatureDetector:
                     # Compute essential matrix and egomotion
                     T = self.compute_egomotion(keypoints, matches)
                     # Add new transformation to buffer
-                    self.transformation_matrices.append(T)  
+                    self.transformation_matrices.append(T)
                     # Apply smoothing
                     smoothed_transform = self.smooth_transform()  
                     # Final pose
@@ -103,12 +109,59 @@ class ORBFeatureDetector:
         # Recover pose from essential matrix
         _, R, t, _ = cv2.recoverPose(points1=points1, points2=points2, E=E, cameraMatrix=self.camera_matrix)
 
+        rot, trn = self.check_min_displacement(R, t)
+
         # Compose the rigid body transformation matrix
         transformation_matrix = np.eye(4)
-        transformation_matrix[:3, :3] = np.round(R, 2)
-        transformation_matrix[:3, 3] = np.round(t.flatten(), 2)
+        transformation_matrix[:3, :3] = np.round(rot, 2)
+        transformation_matrix[:3, 3] = np.round(trn.flatten(), 2)
 
         return np.round(transformation_matrix, 2)
+
+    def check_min_displacement(self, rotation, translation):
+        # Verify Rotation based on constraint
+        theta = math.atan2(rotation[1][0], rotation[0][0]) # angle is in radians
+        rot = np.eye(3)
+
+        if abs(((theta - self.prev_theta) >= self.angle_threshold)):
+            rot = rotation
+            self.prev_theta = theta
+        else:
+            rot = self.yaw_rotation_matrix(self.prev_theta)
+
+        # Verify Translation based on constraint        
+        x, y, z = translation[0][1], translation[1][1], translation[2][1]        
+
+        if self.prev_position == None:
+            self.prev_position = [0.0, 0.0, 0.0]
+            trn = np.array([self.prev_position])
+        else:
+            x0, y0, z0 = self.prev_position[0], self.prev_position[1], self.prev_position[2] 
+            disp = math.sqrt((x-x0)**2 + (y-y0)**2 + (z-z0))
+            if disp >= self.distance_threshold:
+                self.prev_position[0] = x
+                self.prev_position[1] = y
+                self.prev_position[3] = z
+                trn = translation
+            else:
+                trn = np.array([self.prev_position])       
+
+        return rot, trn       
+
+    def yaw_rotation_matrix(self, yaw):
+        # Convert yaw angle to radians
+        yaw = np.radians(yaw)
+        
+        # Compute sine and cosine of the yaw angle
+        c = np.cos(yaw)
+        s = np.sin(yaw)
+        
+        # Construct the rotation matrix
+        Rot = np.array([[c, -s, 0],
+                    [s, c, 0],
+                    [0, 0, 1]])
+    
+        return Rot
 
     def smooth_transform(self):
         if len(self.transformation_matrices) == 0:
