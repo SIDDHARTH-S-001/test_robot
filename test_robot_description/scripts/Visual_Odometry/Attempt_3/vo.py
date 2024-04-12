@@ -18,7 +18,7 @@ class ORBFeatureDetector:
         # verification variables
         self.angle_threshold = 1 * (math.pi / 180)
         self.prev_theta = 0.0
-        self.distance_threshold = 0.05 # units: meters
+        self.distance_threshold = 0.01 # units: meters
         self.prev_position = None
 
     def get_distortion_matrix(self):
@@ -59,8 +59,15 @@ class ORBFeatureDetector:
                     smoothed_transform = self.smooth_transform()  
                     # Final pose
                     self.pose *= smoothed_transform
+                    rot = self.pose[:3, :3]
+                    trn = self.pose[:3, 3]
+                    angle = math.atan2(rot[1][0], rot[0][0]) * (180 / math.pi)
+                    x, y, z = trn[0][0], trn[1][0], trn[2][0]
+
+                    cv2.putText(frame, f'X: {x:.2f}, Y: {y:.2f}, Z: {z:.2f}, Angle: {angle:.2f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+
                     print("Smoothed Pose:")
-                    print(self.pose)
+                    print(np.round(self.pose, 2))
 
             self.prev_keypoints = keypoints
             self.prev_descriptors = descriptors
@@ -124,7 +131,7 @@ class ORBFeatureDetector:
         print("Translation contents:", t)
 
         rot, trn = self.check_min_displacement(R, t)
-
+    
         # Compose the rigid body transformation matrix
         transformation_matrix = np.eye(4)
         transformation_matrix[:3, :3] = np.round(rot, 2)
@@ -160,7 +167,7 @@ class ORBFeatureDetector:
             else:
                 trn = np.array([self.prev_position])       
 
-        return rot, trn       
+        return np.round(rot, 2), np.round(trn, 2)       
 
     def yaw_rotation_matrix(self, yaw):
         # Convert yaw angle to radians
@@ -186,6 +193,7 @@ class ORBFeatureDetector:
         smoothed_transform = self.transformation_matrices[0]  # Initialize with the first transformation
         for i in range(1, len(self.transformation_matrices)):
             smoothed_transform = self.alpha * self.transformation_matrices[i] + (1 - self.alpha) * smoothed_transform
+            
         return np.round(smoothed_transform, 2)
     
 if __name__ == "__main__":
