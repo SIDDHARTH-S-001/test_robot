@@ -137,7 +137,7 @@ class ORBFeatureDetector:
             trn = np.array([self.prev_position])
         else:
             x0, y0, z0 = self.prev_position[0], self.prev_position[1], self.prev_position[2] 
-            disp = math.sqrt((x-x0)**2 + (y-y0)**2 + (z-z0))
+            disp = math.sqrt((x-x0)**2 + (y-y0)**2 + (z-z0)**2)
             if disp >= self.distance_threshold:
                 self.prev_position[0] = x
                 self.prev_position[1] = y
