@@ -5,8 +5,10 @@ from py_trees.composites import Sequence
 from py_trees import logging as log_tree # logging anything we want to see on the terminal
 
 class Action(Behaviour):
-    def __init__(self, name):
+    def __init__(self, name, max_attempt_count):
         super(Action, self).__init__(name)
+        self.max_attempt_count = max_attempt_count
+        self.attempt_count = max_attempt_count
 
     def setup(self):
         self.logger.debug(f"Action::setup {self.name}")
