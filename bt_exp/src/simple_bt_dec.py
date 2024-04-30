@@ -3,6 +3,7 @@ from py_trees.behaviour import Behaviour # Execution Node (action / condition)
 from py_trees.common import Status # success / failure / running
 from py_trees.composites import Sequence
 from py_trees import logging as log_tree # logging anything we want to see on the terminal
+from py_trees.decorators import Inverter
 
 class Action(Behaviour):
     def __init__(self, name):
@@ -17,7 +18,7 @@ class Action(Behaviour):
     def update(self):
         self.logger.debug(f"Action::update {self.name}")
         sleep(1)
-        return Status.SUCCESS
+        return Status.FAILURE
     
     def terminate(self, new_status):
         self.logger.debug(f"Action::terminate {self.name} to {new_status}")
@@ -44,9 +45,9 @@ def make_bt():
     root = Sequence(name="sequence", memory=True)
 
     check_battery = Condition("check_battery")
-    open_gripper = Action("open_gripper")
-    approach_object = Action("approach_gripper")
-    close_gripper = Action("close_gripper")
+    open_gripper = Inverter(child=Action("open_gripper"), name="open_gripper_inverter")
+    approach_object = Inverter(child=Action("approach_gripper"), name="approach_object_inverter")
+    close_gripper = Inverter(child=Action("close_gripper"), name="close_gripper_inverter")
 
     root.add_children(
         [
