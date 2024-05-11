@@ -173,7 +173,8 @@ class GlobalFrame(object):
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
 
     def laser_callback(self, data):
-        self.lidar_data = np.array(data.ranges)
+        if data.ranges:  # Check if laser scan data is not empty
+            self.lidar_data = np.array(data.ranges)
 
     def run_icp(self):
         rate = rospy.Rate(10)  # 10 Hz
