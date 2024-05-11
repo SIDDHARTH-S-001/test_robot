@@ -136,6 +136,10 @@ class ScanICP(object):
 
     def icp_match(self, prev_scan):
 
+        if self.m == 0 or prev_scan.m == 0:
+            # No valid points for ICP matching
+            return np.eye(2), np.zeros(2)
+
         if prev_scan.m > self.m:
             P_prev = prev_scan.P[np.random.randint(prev_scan.m, size=self.m), :]
             P_new = self.P
@@ -192,7 +196,7 @@ class GlobalFrame(object):
                     self.pose -= self.T
                     self.traj = np.vstack((self.traj, self.pose))
 
-                    P_trans = np.dot(self.R, new_scan.P.T) - np.sum(self.T, 0).reshape(2, 1)
+                    P_trans = np.dot(self.R, new_scan.P.T) - np.sum(self.T.reshape(1, -1), axis=0).reshape(2, 1)
 
                     self.scans.append(new_scan)
 
