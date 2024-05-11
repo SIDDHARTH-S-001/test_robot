@@ -164,8 +164,7 @@ class GlobalFrame(object):
         self.traj = self.pose
 
         # Initialize translation and rotation arrays
-        self.R = np.zeros((2, 2))
-        self.R[0, :] = np.eye(2)
+        self.R = np.eye(2)
         self.T = np.zeros((2,))
 
         self.scans = []
