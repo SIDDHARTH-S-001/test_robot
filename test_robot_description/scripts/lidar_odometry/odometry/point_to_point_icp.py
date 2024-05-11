@@ -123,7 +123,7 @@ def icp(A, B, init_pose=None, max_iterations=25, tolerance=0.0001):
 
 class ScanICP(object):
 
-    phi = np.linspace(-2*np.pi/3, 2*np.pi/3, 682)
+    phi = np.linspace(-2*np.pi/3, 2*np.pi/3, 720)
 
     def __init__(self, r):
         mask = (r < 1.5) & (r > 0.1)
