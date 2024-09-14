@@ -6,8 +6,8 @@ from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, Twist, TransformStamped
 import tf2_ros
-from tf.transformations import quaternion_from_matrix, euler_from_matrix
-from sklearn.neighbors import BallTree  # Import Ball Tree from scikit-learn
+from tf.transformations import quaternion_from_matrix
+from sklearn.neighbors import BallTree
 
 class LidarICP:
     def __init__(self):
@@ -18,9 +18,9 @@ class LidarICP:
         self.odom_pub = rospy.Publisher('/odom_estimated', Odometry, queue_size=10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster()
 
-        # Initialize previous point cloud
+        # Initialize previous point cloud and transformation matrix
         self.prev_cloud = None
-        self.prev_pose = np.identity(4)  # 4x4 transformation matrix
+        self.prev_pose = np.identity(4)  # 4x4 transformation matrix (rotation + translation)
 
     def scan_callback(self, scan_msg):
         # Step 1: Convert LaserScan to point cloud
@@ -45,7 +45,7 @@ class LidarICP:
 
     def laser_scan_to_point_cloud(self, scan_msg):
         """
-        Converts LaserScan data to a 2D point cloud
+        Converts LaserScan data to a 2D point cloud.
         """
         angles = np.linspace(scan_msg.angle_min, scan_msg.angle_max, len(scan_msg.ranges))
         ranges = np.array(scan_msg.ranges)
@@ -58,10 +58,10 @@ class LidarICP:
 
     def icp(self, source, target, max_iterations=50, tolerance=1e-5):
         """
-        Perform Point-to-Point ICP between two 2D point clouds.
+        Perform Point-to-Point ICP between two 2D point clouds using 4x4 transformation matrix.
         """
         prev_error = float('inf')
-        transformation = np.identity(3)  # Initialize 2D transformation matrix
+        transformation = np.identity(4)  # Initialize 4x4 transformation matrix
 
         for _ in range(max_iterations):
             # Step 3: Find correspondences (nearest neighbors)
@@ -72,8 +72,12 @@ class LidarICP:
             matched_target = target[indices]  # The corresponding points from the target
 
             # Step 4 (continued): Compute centroids of matched points
-            src_centered = matched_source - np.mean(matched_source, axis=0)
-            tgt_centered = matched_target - np.mean(matched_target, axis=0)
+            src_centroid = np.mean(matched_source, axis=0)
+            tgt_centroid = np.mean(matched_target, axis=0)
+
+            # Center the points
+            src_centered = matched_source - src_centroid
+            tgt_centered = matched_target - tgt_centroid
 
             # Step 5: Compute cross-covariance matrix
             H = np.dot(src_centered.T, tgt_centered)
@@ -87,19 +91,19 @@ class LidarICP:
                 Vt[-1, :] *= -1
                 R = np.dot(Vt.T, U.T)
 
-            # Step 9: Compute translation
-            t = np.mean(matched_target, axis=0) - np.dot(R, np.mean(matched_source, axis=0))
+            # Step 9: Compute translation (3x1 vector)
+            t = tgt_centroid - np.dot(R, src_centroid)
 
-            # Build 3x3 transformation matrix
-            current_transform = np.identity(3)
-            current_transform[:2, :2] = R
-            current_transform[:2, 2] = t
+            # Build 4x4 transformation matrix
+            current_transform = np.identity(4)
+            current_transform[:3, :3] = R
+            current_transform[:3, 3] = np.hstack([t, 0])  # 2D translation, assuming planar motion
 
-            # Update total transformation
+            # Update total transformation (apply current step's transform to the overall transformation)
             transformation = np.dot(current_transform, transformation)
 
             # Apply transformation to source
-            source = np.dot(source, R.T) + t
+            source = (np.dot(R, matched_source.T).T + t)
 
             # Compute the error
             error = np.mean(np.linalg.norm(source - matched_target, axis=1))
@@ -107,8 +111,7 @@ class LidarICP:
                 break
             prev_error = error
 
-        # Return the final transformation as 4x4 (adding Z component for 3D)
-        return np.vstack([np.hstack([transformation[:2, :], np.array([[0], [0]])]), [0, 0, 1, 0], [0, 0, 0, 1]])
+        return transformation  # 4x4 transformation matrix
 
     def find_correspondences(self, source, target):
         """
@@ -119,11 +122,10 @@ class LidarICP:
         tree = BallTree(target, leaf_size=40)
 
         # Query for the nearest neighbors in the target for each point in source
-        distances, indices = tree.query(source, k=1)
+        _, indices = tree.query(source, k=1)
         
         # Return the indices of the nearest neighbors
         return indices.flatten()
-
 
     def publish_odometry(self, pose_matrix):
         """
