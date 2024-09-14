@@ -18,9 +18,9 @@ class LidarICP:
         self.odom_pub = rospy.Publisher('/odom_estimated', Odometry, queue_size=10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster()
 
-        # Initialize previous point cloud and transformation matrix
+        # Initialize previous point cloud
         self.prev_cloud = None
-        self.prev_pose = np.identity(4)  # 4x4 transformation matrix (rotation + translation)
+        self.prev_pose = np.identity(3)  # 3x3 transformation matrix for 2D
 
     def scan_callback(self, scan_msg):
         # Step 1: Convert LaserScan to point cloud
@@ -45,7 +45,7 @@ class LidarICP:
 
     def laser_scan_to_point_cloud(self, scan_msg):
         """
-        Converts LaserScan data to a 2D point cloud.
+        Converts LaserScan data to a 2D point cloud
         """
         angles = np.linspace(scan_msg.angle_min, scan_msg.angle_max, len(scan_msg.ranges))
         ranges = np.array(scan_msg.ranges)
@@ -58,10 +58,10 @@ class LidarICP:
 
     def icp(self, source, target, max_iterations=50, tolerance=1e-5):
         """
-        Perform Point-to-Point ICP between two 2D point clouds using 4x4 transformation matrix.
+        Perform Point-to-Point ICP between two 2D point clouds.
         """
         prev_error = float('inf')
-        transformation = np.identity(4)  # Initialize 4x4 transformation matrix
+        transformation = np.identity(3)  # Initialize 3x3 2D transformation matrix
 
         for _ in range(max_iterations):
             # Step 3: Find correspondences (nearest neighbors)
@@ -91,19 +91,19 @@ class LidarICP:
                 Vt[-1, :] *= -1
                 R = np.dot(Vt.T, U.T)
 
-            # Step 9: Compute translation (3x1 vector)
+            # Step 9: Compute translation
             t = tgt_centroid - np.dot(R, src_centroid)
 
-            # Build 4x4 transformation matrix
-            current_transform = np.identity(4)
-            current_transform[:3, :3] = R
-            current_transform[:3, 3] = np.hstack([t, 0])  # 2D translation, assuming planar motion
+            # Build 3x3 transformation matrix (homogeneous coordinates)
+            current_transform = np.identity(3)
+            current_transform[:2, :2] = R  # Rotation part
+            current_transform[:2, 2] = t   # Translation part
 
-            # Update total transformation (apply current step's transform to the overall transformation)
+            # Update total transformation
             transformation = np.dot(current_transform, transformation)
 
             # Apply transformation to source
-            source = (np.dot(R, matched_source.T).T + t)
+            source = np.dot(source, R.T) + t
 
             # Compute the error
             error = np.mean(np.linalg.norm(source - matched_target, axis=1))
@@ -111,7 +111,8 @@ class LidarICP:
                 break
             prev_error = error
 
-        return transformation  # 4x4 transformation matrix
+        # Return the final 3x3 transformation for 2D (homogeneous coordinates)
+        return transformation
 
     def find_correspondences(self, source, target):
         """
@@ -122,18 +123,22 @@ class LidarICP:
         tree = BallTree(target, leaf_size=40)
 
         # Query for the nearest neighbors in the target for each point in source
-        _, indices = tree.query(source, k=1)
+        distances, indices = tree.query(source, k=1)
         
         # Return the indices of the nearest neighbors
         return indices.flatten()
 
     def publish_odometry(self, pose_matrix):
         """
-        Convert 4x4 pose matrix to Odometry message and publish it.
+        Convert 3x3 pose matrix to Odometry message and publish it.
         """
         # Extract translation and rotation (as quaternion) from the pose matrix
-        translation = pose_matrix[:3, 3]
-        rotation = quaternion_from_matrix(pose_matrix)
+        translation = pose_matrix[:2, 2]
+        rotation_angle = np.arctan2(pose_matrix[1, 0], pose_matrix[0, 0])
+        rotation = quaternion_from_matrix(np.array([[pose_matrix[0, 0], pose_matrix[0, 1], 0, 0],
+                                                    [pose_matrix[1, 0], pose_matrix[1, 1], 0, 0],
+                                                    [0, 0, 1, 0],
+                                                    [0, 0, 0, 1]]))
 
         # Create Odometry message
         odom_msg = Odometry()
@@ -144,7 +149,7 @@ class LidarICP:
         # Set the position and orientation
         odom_msg.pose.pose.position.x = translation[0]
         odom_msg.pose.pose.position.y = translation[1]
-        odom_msg.pose.pose.position.z = translation[2]
+        odom_msg.pose.pose.position.z = 0  # Since it's 2D planar
         odom_msg.pose.pose.orientation.x = rotation[0]
         odom_msg.pose.pose.orientation.y = rotation[1]
         odom_msg.pose.pose.orientation.z = rotation[2]
