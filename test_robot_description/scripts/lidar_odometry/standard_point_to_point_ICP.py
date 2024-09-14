@@ -67,9 +67,13 @@ class LidarICP:
             # Step 3: Find correspondences (nearest neighbors)
             indices = self.find_correspondences(source, target)
 
-            # Step 4: Compute centroids of matched points
-            src_centered = source[indices] - np.mean(source[indices], axis=0)
-            tgt_centered = target - np.mean(target, axis=0)
+            # Step 4: Get matched points in target based on nearest neighbors
+            matched_source = source  # The source points
+            matched_target = target[indices]  # The corresponding points from the target
+
+            # Step 4 (continued): Compute centroids of matched points
+            src_centered = matched_source - np.mean(matched_source, axis=0)
+            tgt_centered = matched_target - np.mean(matched_target, axis=0)
 
             # Step 5: Compute cross-covariance matrix
             H = np.dot(src_centered.T, tgt_centered)
@@ -84,7 +88,7 @@ class LidarICP:
                 R = np.dot(Vt.T, U.T)
 
             # Step 9: Compute translation
-            t = np.mean(target, axis=0) - np.dot(R, np.mean(source[indices], axis=0))
+            t = np.mean(matched_target, axis=0) - np.dot(R, np.mean(matched_source, axis=0))
 
             # Build 3x3 transformation matrix
             current_transform = np.identity(3)
@@ -98,7 +102,7 @@ class LidarICP:
             source = np.dot(source, R.T) + t
 
             # Compute the error
-            error = np.mean(np.linalg.norm(source - target, axis=1))
+            error = np.mean(np.linalg.norm(source - matched_target, axis=1))
             if abs(prev_error - error) < tolerance:
                 break
             prev_error = error
@@ -119,6 +123,7 @@ class LidarICP:
         
         # Return the indices of the nearest neighbors
         return indices.flatten()
+
 
     def publish_odometry(self, pose_matrix):
         """
