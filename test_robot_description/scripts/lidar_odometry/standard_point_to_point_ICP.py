@@ -7,6 +7,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, Twist, TransformStamped
 import tf2_ros
 from tf.transformations import quaternion_from_matrix, euler_from_matrix
+from sklearn.neighbors import BallTree  # Import Ball Tree from scikit-learn
 
 class LidarICP:
     def __init__(self):
@@ -105,17 +106,19 @@ class LidarICP:
         # Return the final transformation as 4x4 (adding Z component for 3D)
         return np.vstack([np.hstack([transformation[:2, :], np.array([[0], [0]])]), [0, 0, 1, 0], [0, 0, 0, 1]])
 
-
     def find_correspondences(self, source, target):
         """
-        Find the nearest neighbors in `target` for each point in `source`.
+        Find the nearest neighbors in `target` for each point in `source`
+        using Ball Tree algorithm for efficient nearest-neighbor search.
         """
-        indices = []
-        for src_point in source:
-            distances = np.linalg.norm(target - src_point, axis=1)
-            nearest_idx = np.argmin(distances)
-            indices.append(nearest_idx)
-        return np.array(indices)
+        # Build Ball Tree for the target point cloud
+        tree = BallTree(target, leaf_size=40)
+
+        # Query for the nearest neighbors in the target for each point in source
+        distances, indices = tree.query(source, k=1)
+        
+        # Return the indices of the nearest neighbors
+        return indices.flatten()
 
     def publish_odometry(self, pose_matrix):
         """
