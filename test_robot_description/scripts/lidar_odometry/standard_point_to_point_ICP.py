@@ -31,11 +31,11 @@ class LidarICP:
             self.prev_cloud = point_cloud
             return
 
-        # Step 3-9: Perform ICP between previous and current point cloud
+        # Step 3-9: Perform ICP between previous and current point cloud using Euclidean distance
         transformation = self.icp(self.prev_cloud, point_cloud)
 
         # Step 10: Update the pose by applying the transformation
-        self.prev_pose = np.dot(self.prev_pose, transformation) # Transformation matrix was initialized as identity matrix
+        self.prev_pose = np.dot(transformation, self.prev_pose)  # Apply current transformation to the accumulated pose
 
         # Step 11: Convert pose to odometry and publish
         self.publish_odometry(self.prev_pose)
@@ -56,9 +56,9 @@ class LidarICP:
         # Return Nx2 point cloud
         return np.vstack((x, y)).T
 
-    def icp(self, source, target, max_iterations=1000, tolerance=1e-4):
+    def icp(self, source, target, max_iterations=50, tolerance=1e-5):
         """
-        Perform Point-to-Point ICP between two 2D point clouds using Chamfer Distance.
+        Perform Point-to-Point ICP between two 2D point clouds using Euclidean distance.
         """
         prev_error = float('inf')
         transformation = np.identity(3)  # Initialize 3x3 2D transformation matrix
@@ -66,13 +66,12 @@ class LidarICP:
         for _ in range(max_iterations):
             # Step 3: Find correspondences (nearest neighbors)
             indices_source = self.find_correspondences(source, target)
-            indices_target = self.find_correspondences(target, source)
+            
+            # Matched points
+            matched_source = source
+            matched_target = target[indices_source]
 
-            # Step 4: Get matched points in target based on nearest neighbors
-            matched_source = source  # Source points
-            matched_target = target[indices_source]  # Matched points from target
-
-            # Step 4 (continued): Compute centroids of matched points
+            # Step 4: Compute centroids of matched points
             src_centroid = np.mean(matched_source, axis=0)
             tgt_centroid = np.mean(matched_target, axis=0)
 
@@ -106,11 +105,8 @@ class LidarICP:
             # Apply transformation to source
             source = np.dot(source, R.T) + t
 
-            # Compute the Chamfer distance as error
-            error_source_to_target = np.mean(np.min(np.linalg.norm(source[:, None] - target[None, :], axis=2), axis=1))
-            error_target_to_source = np.mean(np.min(np.linalg.norm(target[:, None] - source[None, :], axis=2), axis=1))
-
-            error = (error_source_to_target + error_target_to_source) / 2
+            # Compute the Euclidean distance as error
+            error = np.mean(np.linalg.norm(source - matched_target, axis=1))
 
             if abs(prev_error - error) < tolerance:
                 break
@@ -118,7 +114,6 @@ class LidarICP:
 
         # Return the final 3x3 transformation for 2D (homogeneous coordinates)
         return transformation
-
 
     def find_correspondences(self, source, target):
         """
@@ -129,7 +124,7 @@ class LidarICP:
         tree = BallTree(target, leaf_size=40)
 
         # Query for the nearest neighbors in the target for each point in source
-        distances, indices = tree.query(source, k=1)
+        _, indices = tree.query(source, k=1)
         
         # Return the indices of the nearest neighbors
         return indices.flatten()
@@ -149,7 +144,7 @@ class LidarICP:
         # Create Odometry message
         odom_msg = Odometry()
         odom_msg.header.stamp = rospy.Time.now()
-        odom_msg.header.frame_id = 'world'
+        odom_msg.header.frame_id = 'odom_new'
         odom_msg.child_frame_id = 'base_link'
 
         # Set the position and orientation
@@ -167,7 +162,7 @@ class LidarICP:
         # Broadcast the transformation
         transform = TransformStamped()
         transform.header.stamp = rospy.Time.now()
-        transform.header.frame_id = 'world'
+        transform.header.frame_id = 'odom_new'
         transform.child_frame_id = 'base_link'
         transform.transform.translation.x = translation[0]
         transform.transform.translation.y = translation[1]
