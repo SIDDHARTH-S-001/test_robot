@@ -21,9 +21,16 @@ class LidarICP:
         # Initialize previous point cloud and pose
         self.prev_cloud = None
         self.prev_pose = np.identity(3)  # 3x3 transformation matrix for 2D
-        self.prev_translation = np.array([0.0, 0.0])  # Keep track of previous translation
+        self.frame_skip = 5  # Process every 5th frame
+        self.frame_count = 0
 
     def scan_callback(self, scan_msg):
+        self.frame_count += 1
+
+        # Only process every `frame_skip` frames
+        if self.frame_count % self.frame_skip != 0:
+            return
+
         # Step 1: Convert LaserScan to point cloud
         point_cloud = self.laser_scan_to_point_cloud(scan_msg)
 
@@ -68,9 +75,9 @@ class LidarICP:
         # Return Nx2 point cloud
         return np.vstack((x, y)).T
 
-    def icp(self, source, target, max_iterations=50, tolerance=1e-5):
+    def icp(self, source, target, max_iterations=1000, tolerance=1e-4):
         """
-        Perform Point-to-Point ICP between two 2D point clouds using Euclidean distance.
+        Perform Point-to-Point ICP between two 2D point clouds using Chamfer Distance.
         """
         prev_error = float('inf')
         transformation = np.identity(3)  # Initialize 3x3 2D transformation matrix
@@ -78,12 +85,19 @@ class LidarICP:
         for _ in range(max_iterations):
             # Step 3: Find correspondences (nearest neighbors)
             indices_source = self.find_correspondences(source, target)
-            
-            # Matched points
-            matched_source = source
-            matched_target = target[indices_source]
+            indices_target = self.find_correspondences(target, source)
 
-            # Step 4: Compute centroids of matched points
+            # Ensure that source and target correspondences have equal size
+            if len(indices_source) != len(indices_target):
+                min_size = min(len(indices_source), len(indices_target))
+                indices_source = indices_source[:min_size]
+                indices_target = indices_target[:min_size]
+
+            # Step 4: Get matched points in target based on nearest neighbors
+            matched_source = source  # Source points
+            matched_target = target[indices_source]  # Matched points from target
+
+            # Step 4 (continued): Compute centroids of matched points
             src_centroid = np.mean(matched_source, axis=0)
             tgt_centroid = np.mean(matched_target, axis=0)
 
@@ -117,8 +131,11 @@ class LidarICP:
             # Apply transformation to source
             source = np.dot(source, R.T) + t
 
-            # Compute the Euclidean distance as error
-            error = np.mean(np.linalg.norm(source - matched_target, axis=1))
+            # Compute the Chamfer distance as error
+            error_source_to_target = np.mean(np.min(np.linalg.norm(source[:, None] - target[None, :], axis=2), axis=1))
+            error_target_to_source = np.mean(np.min(np.linalg.norm(target[:, None] - source[None, :], axis=2), axis=1))
+
+            error = (error_source_to_target + error_target_to_source) / 2
 
             if abs(prev_error - error) < tolerance:
                 break
@@ -140,6 +157,19 @@ class LidarICP:
         
         # Return the indices of the nearest neighbors
         return indices.flatten()
+
+    def reject_outliers(self, distances):
+        """
+        Rejects outliers using the IQR method.
+        """
+        q1 = np.percentile(distances, 25)
+        q3 = np.percentile(distances, 75)
+        iqr = q3 - q1
+        lower_bound = q1 - 1.5 * iqr
+        upper_bound = q3 + 1.5 * iqr
+
+        # Return a mask of points that are within the IQR range
+        return (distances >= lower_bound) & (distances <= upper_bound)
 
     def publish_odometry(self, pose_matrix):
         """
