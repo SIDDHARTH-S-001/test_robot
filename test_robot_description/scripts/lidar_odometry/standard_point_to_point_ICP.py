@@ -35,7 +35,7 @@ class LidarICP:
         transformation = self.icp(self.prev_cloud, point_cloud)
 
         # Step 10: Update the pose by applying the transformation
-        self.prev_pose = np.dot(self.prev_pose, transformation)
+        self.prev_pose = np.dot(self.prev_pose, transformation) # Transformation matrix was initialized as identity matrix
 
         # Step 11: Convert pose to odometry and publish
         self.publish_odometry(self.prev_pose)
@@ -56,12 +56,13 @@ class LidarICP:
         # Return Nx2 point cloud
         return np.vstack((x, y)).T
 
-    def icp(self, source, target, max_iterations=50, tolerance=1e-5):
+    def icp(self, source, target, max_iterations=100, tolerance=1e-3):
         """
         Perform Point-to-Point ICP between two 2D point clouds.
         """
         prev_error = float('inf')
         transformation = np.identity(3)  # Initialize 3x3 2D transformation matrix
+        # Tolerance measured as eucledian distance between corresponding points in source and target cloud, units: meters
 
         for _ in range(max_iterations):
             # Step 3: Find correspondences (nearest neighbors)
@@ -75,7 +76,7 @@ class LidarICP:
             src_centroid = np.mean(matched_source, axis=0)
             tgt_centroid = np.mean(matched_target, axis=0)
 
-            # Center the points
+            # Step 4 (continued): Center the points
             src_centered = matched_source - src_centroid
             tgt_centered = matched_target - tgt_centroid
 
@@ -106,7 +107,8 @@ class LidarICP:
             source = np.dot(source, R.T) + t
 
             # Compute the error
-            error = np.mean(np.linalg.norm(source - matched_target, axis=1))
+            error = np.mean(np.linalg.norm(source - matched_target, axis=1)) 
+            # axis 1 ensures norm is computed for each point induvidually, rather than the entire point cloud
             if abs(prev_error - error) < tolerance:
                 break
             prev_error = error
@@ -149,7 +151,7 @@ class LidarICP:
         # Set the position and orientation
         odom_msg.pose.pose.position.x = translation[0]
         odom_msg.pose.pose.position.y = translation[1]
-        odom_msg.pose.pose.position.z = 0  # Since it's 2D planar
+        odom_msg.pose.pose.position.z = 0  # Since it's 2D planar robot
         odom_msg.pose.pose.orientation.x = rotation[0]
         odom_msg.pose.pose.orientation.y = rotation[1]
         odom_msg.pose.pose.orientation.z = rotation[2]
