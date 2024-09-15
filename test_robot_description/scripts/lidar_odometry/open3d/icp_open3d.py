@@ -77,7 +77,7 @@ class LidarOdometry:
         # Create Odometry message
         odom_msg = Odometry()
         odom_msg.header.stamp = rospy.Time.now()
-        odom_msg.header.frame_id = 'world'
+        odom_msg.header.frame_id = 'odom_new'
         odom_msg.child_frame_id = 'base_link'
         odom_msg.pose.pose = pose
         self.odom_pub.publish(odom_msg)
@@ -85,7 +85,7 @@ class LidarOdometry:
         # Create TransformStamped message
         transform = TransformStamped()
         transform.header.stamp = rospy.Time.now()
-        transform.header.frame_id = 'world'
+        transform.header.frame_id = 'odom_new'
         transform.child_frame_id = 'base_link'
         transform.transform.translation.x = pose.position.x
         transform.transform.translation.y = pose.position.y
