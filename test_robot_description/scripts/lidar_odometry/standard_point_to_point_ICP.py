@@ -56,21 +56,21 @@ class LidarICP:
         # Return Nx2 point cloud
         return np.vstack((x, y)).T
 
-    def icp(self, source, target, max_iterations=100, tolerance=1e-3):
+    def icp(self, source, target, max_iterations=1000, tolerance=1e-4):
         """
-        Perform Point-to-Point ICP between two 2D point clouds.
+        Perform Point-to-Point ICP between two 2D point clouds using Chamfer Distance.
         """
         prev_error = float('inf')
         transformation = np.identity(3)  # Initialize 3x3 2D transformation matrix
-        # Tolerance measured as eucledian distance between corresponding points in source and target cloud, units: meters
 
         for _ in range(max_iterations):
             # Step 3: Find correspondences (nearest neighbors)
-            indices = self.find_correspondences(source, target)
+            indices_source = self.find_correspondences(source, target)
+            indices_target = self.find_correspondences(target, source)
 
             # Step 4: Get matched points in target based on nearest neighbors
-            matched_source = source  # The source points
-            matched_target = target[indices]  # The corresponding points from the target
+            matched_source = source  # Source points
+            matched_target = target[indices_source]  # Matched points from target
 
             # Step 4 (continued): Compute centroids of matched points
             src_centroid = np.mean(matched_source, axis=0)
@@ -106,15 +106,19 @@ class LidarICP:
             # Apply transformation to source
             source = np.dot(source, R.T) + t
 
-            # Compute the error
-            error = np.mean(np.linalg.norm(source - matched_target, axis=1)) 
-            # axis 1 ensures norm is computed for each point induvidually, rather than the entire point cloud
+            # Compute the Chamfer distance as error
+            error_source_to_target = np.mean(np.min(np.linalg.norm(source[:, None] - target[None, :], axis=2), axis=1))
+            error_target_to_source = np.mean(np.min(np.linalg.norm(target[:, None] - source[None, :], axis=2), axis=1))
+
+            error = (error_source_to_target + error_target_to_source) / 2
+
             if abs(prev_error - error) < tolerance:
                 break
             prev_error = error
 
         # Return the final 3x3 transformation for 2D (homogeneous coordinates)
         return transformation
+
 
     def find_correspondences(self, source, target):
         """
