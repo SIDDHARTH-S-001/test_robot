@@ -18,9 +18,10 @@ class LidarICP:
         self.odom_pub = rospy.Publisher('/odom_estimated', Odometry, queue_size=10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster()
 
-        # Initialize previous point cloud
+        # Initialize previous point cloud and pose
         self.prev_cloud = None
         self.prev_pose = np.identity(3)  # 3x3 transformation matrix for 2D
+        self.prev_translation = np.array([0.0, 0.0])  # Keep track of previous translation
 
     def scan_callback(self, scan_msg):
         # Step 1: Convert LaserScan to point cloud
@@ -34,13 +35,22 @@ class LidarICP:
         # Step 3-9: Perform ICP between previous and current point cloud using Euclidean distance
         transformation = self.icp(self.prev_cloud, point_cloud)
 
-        # Step 10: Update the pose by applying the transformation
-        self.prev_pose = np.dot(transformation, self.prev_pose)  # Apply current transformation to the accumulated pose
+        # Step 10: Separate rotation and translation
+        rotation, translation = transformation[:2, :2], transformation[:2, 2]
 
-        # Step 11: Convert pose to odometry and publish
+        # Step 11: Check if it's mainly rotation or translation
+        if np.linalg.norm(translation) < 0.05:  # If translation is negligible, update only rotation
+            current_transform = np.identity(3)
+            current_transform[:2, :2] = rotation  # Update only the rotation part
+            self.prev_pose = np.dot(current_transform, self.prev_pose)
+        else:
+            # Update both translation and rotation if movement occurred
+            self.prev_pose = np.dot(transformation, self.prev_pose)
+
+        # Step 12: Convert pose to odometry and publish
         self.publish_odometry(self.prev_pose)
 
-        # Step 12: Store the current scan as the previous scan for the next iteration
+        # Step 13: Store the current scan as the previous scan for the next iteration
         self.prev_cloud = point_cloud
 
     def laser_scan_to_point_cloud(self, scan_msg):
@@ -144,7 +154,7 @@ class LidarICP:
         # Create Odometry message
         odom_msg = Odometry()
         odom_msg.header.stamp = rospy.Time.now()
-        odom_msg.header.frame_id = 'odom_new'
+        odom_msg.header.frame_id = 'world'
         odom_msg.child_frame_id = 'base_link'
 
         # Set the position and orientation
@@ -162,7 +172,7 @@ class LidarICP:
         # Broadcast the transformation
         transform = TransformStamped()
         transform.header.stamp = rospy.Time.now()
-        transform.header.frame_id = 'odom_new'
+        transform.header.frame_id = 'world'
         transform.child_frame_id = 'base_link'
         transform.transform.translation.x = translation[0]
         transform.transform.translation.y = translation[1]
